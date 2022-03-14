@@ -3,7 +3,6 @@ __copyright__ = code_copyright = "Copyright © 2022 Thierry Meiers"
 __license__ = "Public Domain"
 __version__ = code_version = "3.7.1"
 
-
 import tkinter as tk
 import os
 import clipboard 
@@ -13,7 +12,7 @@ from ttkthemes import ThemedTk
 from tkinter.font import Font
 from tkinter import messagebox
 from app import app_lib
-from data import save_data_lib
+from data import save_data_lib, create_backup_file
 from datetime import date
 from debts import debts_lib
 
@@ -58,8 +57,6 @@ def update_screen(app : app_lib.app_state):
     d8.config(text=s[8])
     d9.config(text=s[9])
 
-    print(f"\n\nUpdate:\nData: {app.data_array}\nSettings{app.settings}")
-
 def safe_to_dataarray (app : app_lib.app_state):
     if len(app_lib.find_names(app))+1 > 10:
         messagebox.showwarning('Warning', 'Name Error: Only 10 persons are allowed')
@@ -100,7 +97,6 @@ def OnDoubleClick(app: app_lib.app_state, event):
     e4.insert(0, curItem['values'][3])
 
 def save (app : app_lib.app_state):
-
     app.safe_state_data = True
     save_data_lib.save_data_in_file(app)
     save_data_lib.save_settings_in_file(app)
@@ -151,7 +147,7 @@ def settings (root : tk.Tk, app : app_lib.app_state) :
             pass
         else:
             save_data_lib.check_if_dir_exist(app.settings.data_dir_path)
-            os.rename(f'{prew_dir}\BondMarket_test\data.pkl' ,f'{app.settings.data_dir_path}\BondMarket_test\data.pkl')
+            os.rename(f'{prew_dir}\BondMarket\data.pkl' ,f'{app.settings.data_dir_path}\BondMarket\data.pkl')
         update_screen(app)
 
     def save_appearance (app : app_lib.app_state):
@@ -162,7 +158,7 @@ def settings (root : tk.Tk, app : app_lib.app_state) :
             winx = win.winfo_width()
             winy = win.winfo_height()
             win.destroy()
-            main(winx, winy, True)
+            window(winx, winy, True)
 
     def save_filter (app : app_lib.app_state):
         if jear.get() == '' or month.get() == '':
@@ -195,13 +191,14 @@ def settings (root : tk.Tk, app : app_lib.app_state) :
 
     tk.Label(root, text='Data Path:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=7, sticky='w', pady=5)
     p1 = tk.Label(root, text=f"{app.settings.data_dir_path}", fg=text_color, bg=lab_color)
-    tk.Label(root, text=f"Default: ~/Documents", fg=text_color, bg=lab_color).place(x=1, y=260)
-    p1.place(x=1, y=230)
+    tk.Label(root, text=f"Default: ~/Documents", fg=text_color, bg=lab_color).place(x=1, y=290)
+    p1.place(x=1, y=270)
 
     ttk.Button(root, text='Apply', command=(lambda : save_appearance(app))).grid(row=1, column=10, padx=5, pady=5)
     ttk.Button(root, text='Clear Data', command=(lambda : clear(app))).grid(row=4, column=10, padx=5, pady=5)
     ttk.Button(root, text='Apply', command=(lambda : save_filter(app))).grid(row=5, column=10, padx=5, pady=5)
-    ttk.Button(root, text='Change', command=(lambda : get_data_dir(app))).grid(row=7, column=10, padx=5, pady=5)
+    ttk.Button(root, text='Create Backup', command=(lambda : create_backup_file.create_backup(app))).grid(row=8, column=0, padx=5, pady=5)
+    ttk.Button(root, text='Change', command=(lambda : get_data_dir(app))).grid(row=9, column=10, padx=5, pady=5)
 
 def info (root) :
 
@@ -283,14 +280,12 @@ def center_window(root : tk.Tk, w=300, h=200):
     y = (hs/2) - (h/2)
     root.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
-def main (winx : int, winy : int, restart : bool):
+def window (winx : int, winy : int, restart : bool):
 
     global bg_color, text_color, lab_color, win
     app = app_lib.app_state([], {}, True)
     save_data_lib.read_settings_from_file(app)
     save_data_lib.read_data_from_file(app)
-    print(f"{app.settings}\n")
-    print(f"{app.data_array}\n")
     win = ThemedTk()
     center_window(win, winx, winy)
     if app.settings.appearance == 'white':
@@ -303,9 +298,6 @@ def main (winx : int, winy : int, restart : bool):
         text_color = 'white'
         lab_color = '#424242'
 
-    if app.settings.data_dir_path == 'na':
-        messagebox.showwarning('Warning:', 'Please select a folder in the settings to save the data.')
-        
     # Window settings ##############################################################################################
     win.title('BondMarket')
     win.iconbitmap('D:\Documente\Git\BoundMarked\BoundMarked\Icon\BondMarked_Icon.ico')
