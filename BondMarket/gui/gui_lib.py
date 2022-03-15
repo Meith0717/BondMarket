@@ -155,8 +155,15 @@ def settings (root : tk.Tk, app : app_lib.app_state) :
             pass
         else:
             save_data_lib.check_if_dir_exist(app.settings.data_dir_path)
-            os.rename(f'{prew_dir}\BondMarket\data.pkl' ,f'{app.settings.data_dir_path}\BondMarket\data.pkl')
-            save(app)
+            try:
+                os.rename(f'{prew_dir}\BondMarket\data.pkl' ,f'{app.settings.data_dir_path}\BondMarket\data.pkl')
+                save(app)
+            except FileExistsError:
+                save_data_lib.save_settings_in_file(app)
+                win.destroy()
+                os.remove(f'{prew_dir}\BondMarket\data.pkl')
+                window(750, 550, True)
+
 
     def save_appearance (app : app_lib.app_state):
         if app.settings.appearance != sel_apperance.get():
@@ -177,8 +184,9 @@ def settings (root : tk.Tk, app : app_lib.app_state) :
             update_screen(app)
 
     def clear (app : app_lib.app_state):
-        app.data_array = []
-        update_screen(app)
+        if messagebox.askyesno(title='Warning:', message='Are you sure you want to delete everything?'):
+            app.data_array = []
+            update_screen(app)
 
     tk.Label(root, text='Appearance:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=1, sticky='w', pady=5)
     
@@ -217,14 +225,8 @@ def info (root) :
     def redirected_paypal ():
         if messagebox.askokcancel(title='Info',message='You will be redirected to paypal.com, do you want to continue?'):
             webbrowser.open('https://www.paypal.com/donate/?hosted_button_id=47BGH5AWNSV88', new=0, autoraise=True)
-
-    text : str = ['This application is very suitable when you want to have ',
-                'an overview of your expenses in a group or as a couple. ',
-                'The table can show all expenses but also those of a specific ',
-                'month. If errors occur or you have suggestions ',
-                'for improvement, please feel free to contact me. '] 
-    for i, row in enumerate(text):
-        tk.Label(root, text=row, fg=text_color, bg=lab_color).place(x=2, y=25*i+2)
+ 
+    tk.Label(root, text='Not yet implemented', fg='red', bg=lab_color).place(x=2, y=25)
     tk.Button(root, text='Donate', relief='flat', fg=text_color, bg=lab_color, activebackground=lab_color, command=redirected_paypal).pack(side='right', anchor='se', padx=3, pady=3)
     tk.Button(root, text='meith0717@gmail.com', relief='flat', fg=text_color, bg=lab_color, activebackground=lab_color, command=(lambda : messagebox.showinfo(title='Info',message='Mail-Adress copy to clipboard', options=clipboard.copy('meith0717@gmail.com')))).pack(side='left', anchor='sw', padx=3, pady=3)
 
@@ -339,6 +341,7 @@ def window (winx : int, winy : int, restart : bool):
     tab.add(tab3, text = 'Info')
     info(tab3)
     tab.add(tab4, text='Help')
+    tk.Label(tab4, text='Not yet implemented', fg='red', bg=lab_color).place(x=2, y=25)
     tab.pack(side='left', fill='both', padx=5, pady=5)
     # cavas ##############################################################################################
     fields : list = ['Person:', 'Amount:', 'Coment:', 'Date:']

@@ -1,14 +1,16 @@
 from data import save_data_lib
 import os
+from tkinter import messagebox
 from datetime import datetime
 from app import app_lib
 
 def create_backup (app : app_lib.app_state):
-    path = os.path.expanduser('~/Documents')
+    path = os.path.expanduser('~\Documents\BondMarket')
     try:
-        os.mkdir(f'{path}/BondMarked_Backup')
+        os.mkdir(f'{path}\BondMarket_Backup')
     except FileExistsError:
         pass
-    path = f'{path}/BondMarked_Backup'
+    path = f'{path}\BondMarket_Backup'
     save_data_lib.save_in_pkl(f'{datetime.now().strftime("%S.%M.%H %d.%m.%Y")} data.pkl', app.data_array, path)
     save_data_lib.save_in_pkl(f'{datetime.now().strftime("%S.%M.%H %d.%m.%Y")} config.pkl', app.settings, path)
+    messagebox.showinfo(title='Info:', message=f'{datetime.now().strftime("%S.%M.%H %d.%m.%Y")} data.pkl and {datetime.now().strftime("%S.%M.%H %d.%m.%Y")} config.pkl were generated in {path}.')
