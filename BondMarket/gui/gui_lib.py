@@ -33,6 +33,13 @@ def update_screen(app : app_lib.app_state):
         e4.insert(0, f"{app.settings.jear}.{app.settings.month}.01")
 
     p1.config(text=f"{app.settings.data_dir_path}")
+
+    if app.safe_state_data is True:
+        change.config(state='enabled')
+        backup.config(state='enabled')
+    else:
+        change.config(state='disabled')
+        backup.config(state='disabled')
     
     l : list = debts_lib.calc_expand(app)
     s : list = debts_lib.get_transfere_str(app)
@@ -100,6 +107,7 @@ def save (app : app_lib.app_state):
     app.safe_state_data = True
     save_data_lib.save_data_in_file(app)
     save_data_lib.save_settings_in_file(app)
+    update_screen(app)
     
 def clear (app : app_lib.app_state):
     combo1.delete(0, 100)
@@ -136,7 +144,7 @@ def draw_tree (root, app : app_lib.app_state):
     tree.bind("<Double-1>", lambda event: OnDoubleClick(app, event))
 
 def settings (root : tk.Tk, app : app_lib.app_state) :
-    global p1
+    global p1, change, backup
 
     def get_data_dir (app : app_lib.app_state):
         prew_dir = app.settings.data_dir_path
@@ -148,7 +156,7 @@ def settings (root : tk.Tk, app : app_lib.app_state) :
         else:
             save_data_lib.check_if_dir_exist(app.settings.data_dir_path)
             os.rename(f'{prew_dir}\BondMarket\data.pkl' ,f'{app.settings.data_dir_path}\BondMarket\data.pkl')
-        update_screen(app)
+            save(app)
 
     def save_appearance (app : app_lib.app_state):
         if app.settings.appearance != sel_apperance.get():
@@ -197,8 +205,12 @@ def settings (root : tk.Tk, app : app_lib.app_state) :
     ttk.Button(root, text='Apply', command=(lambda : save_appearance(app))).grid(row=1, column=10, padx=5, pady=5)
     ttk.Button(root, text='Clear Data', command=(lambda : clear(app))).grid(row=4, column=10, padx=5, pady=5)
     ttk.Button(root, text='Apply', command=(lambda : save_filter(app))).grid(row=5, column=10, padx=5, pady=5)
-    ttk.Button(root, text='Create Backup', command=(lambda : create_backup_file.create_backup(app))).grid(row=8, column=0, padx=5, pady=5)
-    ttk.Button(root, text='Change', command=(lambda : get_data_dir(app))).grid(row=9, column=10, padx=5, pady=5)
+    backup = ttk.Button(root, text='Create Backup', command=(lambda : create_backup_file.create_backup(app)))
+    backup.grid(row=8, column=0, padx=5, pady=5)
+    change = ttk.Button(root, text='Change', command=(lambda : get_data_dir(app)))
+    change.grid(row=9, column=10, padx=5, pady=5)
+    change.config(state='disabled')
+    backup.config(state='disabled')
 
 def info (root) :
 
@@ -297,10 +309,10 @@ def window (winx : int, winy : int, restart : bool):
         bg_color = '#424242'
         text_color = 'white'
         lab_color = '#424242'
-
+    
     # Window settings ##############################################################################################
     win.title('BondMarket')
-    win.iconbitmap('D:\Documente\Git\BoundMarked\BoundMarked\Icon\BondMarked_Icon.ico')
+    win.wm_attributes('-toolwindow', 'True')
     win.config(bg=bg_color)
     win.attributes('-fullscreen', app.settings.fullscreen)
     win.geometry(f'{winx}x{winy}')
