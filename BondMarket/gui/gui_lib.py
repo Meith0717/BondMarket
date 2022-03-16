@@ -1,7 +1,7 @@
 __author__ = code_autor = "Thierry Meiers"
 __copyright__ = code_copyright = "Copyright © 2022 Thierry Meiers"
 __license__ = "Apache License 2.0"
-__version__ = code_version = "3.8"
+__version__ = code_version = "3.8.1"
 
 import tkinter as tk
 import os
