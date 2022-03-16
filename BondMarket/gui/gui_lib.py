@@ -12,7 +12,7 @@ from ttkthemes import ThemedTk
 from tkinter.font import Font
 from tkinter import messagebox
 from app import app_lib
-from data import save_data_lib, create_backup_file
+from data import save_data_lib, create_backup_file, export_txt_file
 from datetime import date
 from debts import debts_lib
 
@@ -126,9 +126,15 @@ def draw_tree (root, app : app_lib.app_state):
     headline : list = ['Person', 'Amount', 'Coment', 'Date']
     tree.tag_configure('odd', background='#F4F6F7')
     tree.tag_configure('even', background='#F0F3F4')
-    for c in range(4):
-        tree.column("# %s" %str(c+1), width=30)
-        tree.heading("# %s" %str(c+1), text=headline[c])
+
+    tree.column("# 1", width=12, anchor='w')
+    tree.heading("# 1", text=headline[0], anchor='w')
+    tree.column("# 2", width=12, anchor='w')
+    tree.heading("# 2", text=headline[1], anchor='w')
+    tree.column("# 3", width=86, anchor='w')
+    tree.heading("# 3", text=headline[2], anchor='w')
+    tree.column("# 4", width=10, anchor='w')
+    tree.heading("# 4", text=headline[3], anchor='w')
 
     for d in app.data_array:
         if app.settings.month == 'all':
@@ -196,7 +202,7 @@ def settings (root : tk.Tk, app : app_lib.app_state) :
     ttk.Radiobutton(root, text='Dark', value='Dark', variable=sel_apperance).grid(row=3, sticky='w', pady=5)
 
     tk.Label(root, text='Data Table:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=4, sticky='w', pady=5)
-    tk.Label(root, text='Month/Event:', fg=text_color, bg=lab_color).grid(row=5, sticky='w', pady=5)
+    tk.Label(root, text='Month:', fg=text_color, bg=lab_color).grid(row=5, sticky='w', pady=5)
     month = ttk.Combobox(root, values=tuple(x for x in ['all', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11' ,'12']))
     month.grid(row=5,column=2,sticky='w', pady=5)
     month.insert(0, date.today().strftime("%m"))
@@ -221,7 +227,6 @@ def settings (root : tk.Tk, app : app_lib.app_state) :
     backup.config(state='disabled')
 
 def info (root) :
-
     def redirected_paypal ():
         if messagebox.askokcancel(title='Info',message='You will be redirected to paypal.com, do you want to continue?'):
             webbrowser.open('https://www.paypal.com/donate/?hosted_button_id=47BGH5AWNSV88', new=0, autoraise=True)
@@ -277,6 +282,7 @@ def tools (root : tk.Tk, app : app_lib.app_state):
     d9.grid(row=11, column=0, sticky='w', pady=0, padx=2)
     tk.Label(root, text='Total expenses:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=0, column=0, sticky='w', pady=0, padx=2)
     tk.Label(root, text='Total debt:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=11, column=0, sticky='w', pady=0, padx=2)
+    ttk.Button(root, text='Export Text File', command=(lambda : export_txt_file.export(app))).grid(row=0, column=10, sticky='e')
 
 def set_fullscreen(app : app_lib.app_state): 
     if app.settings.fullscreen:
@@ -331,17 +337,14 @@ def window (winx : int, winy : int, restart : bool):
     # Tabs ###############################################################################################
     tab = ttk.Notebook(more_frame)
     tab1 = ttk.Frame(tab)
-    tab2 = ttk.Frame(tab)  
+    tab2 = ttk.Frame(tab) 
     tab3 = ttk.Frame(tab) 
-    tab4 = ttk.Frame(tab) 
-    tab.add(tab1, text ='Tools')
+    tab.add(tab1, text ='     Tools     ')
     tools(tab1, app)
-    tab.add(tab2, text ='Settings')
+    tab.add(tab2, text ='    Settings   ')
     settings(tab2, app)
-    tab.add(tab3, text = 'Info')
+    tab.add(tab3, text ='   Help/Info   ')
     info(tab3)
-    tab.add(tab4, text='Help')
-    tk.Label(tab4, text='Not yet implemented', fg='red', bg=lab_color).place(x=2, y=25)
     tab.pack(side='left', fill='both', padx=5, pady=5)
     # cavas ##############################################################################################
     fields : list = ['Person:', 'Amount:', 'Coment:', 'Date:']

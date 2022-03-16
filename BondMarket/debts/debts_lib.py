@@ -49,7 +49,7 @@ def get_average (app : app_lib.app_state):
         total += amount
     return round(total/len(d), 2)
 
-def calc (app : app_lib.app_state):
+def calc (app : app_lib.app_state) -> list:
     l       : list  = get_debts_matrix(app)
     average : float = get_average(app)
     for i in range(len(l)):
