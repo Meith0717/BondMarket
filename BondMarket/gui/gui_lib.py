@@ -1,7 +1,6 @@
-__author__ = code_autor = "Thierry Meiers"
-__copyright__ = code_copyright = "Copyright © 2022 Thierry Meiers"
-__license__ = "Apache License 2.0"
-__version__ = code_version = "3.8.1"
+code_autor = "Thierry Meiers"
+code_copyright = "Copyright © 2022 Thierry Meiers"
+code_version = "3.8.1"
 
 import tkinter as tk
 import os
@@ -119,7 +118,25 @@ def clear (app : app_lib.app_state):
     else:
         e4.insert(0, f"{app.settings.jear}.{app.settings.month}.01")
 
-def draw_tree (root, app : app_lib.app_state):
+def center_window(root : tk.Tk, w=300, h=200):
+    # get screen width and height
+    ws = root.winfo_screenwidth()
+    hs = root.winfo_screenheight()
+    # calculate position x, y
+    x = (ws/2) - (w/2)    
+    y = (hs/2) - (h/2)
+    root.geometry('%dx%d+%d+%d' % (w, h, x, y))
+
+def set_fullscreen(app : app_lib.app_state) -> None: 
+    '''Checks the settings whether the full
+     screen setting is set to true or false.'''
+    if app.settings.fullscreen:
+        app.settings.fullscreen = False
+    else:
+        app.settings.fullscreen = True
+    win.attributes('-fullscreen', app.settings.fullscreen)
+
+def table_ (root, app : app_lib.app_state):
     global tree
     tree = ttk.Treeview(root, column=("c1", "c2", "c3", "c4"), show='headings', selectmode='browse', height=200)
     vsb = ttk.Scrollbar(root, orient='vertical', command=tree.yview)
@@ -127,11 +144,11 @@ def draw_tree (root, app : app_lib.app_state):
     tree.tag_configure('odd', background='#F4F6F7')
     tree.tag_configure('even', background='#F0F3F4')
 
-    tree.column("# 1", width=12, anchor='w')
+    tree.column("# 1", width=8, anchor='w')
     tree.heading("# 1", text=headline[0], anchor='w')
-    tree.column("# 2", width=12, anchor='w')
+    tree.column("# 2", width=8, anchor='w')
     tree.heading("# 2", text=headline[1], anchor='w')
-    tree.column("# 3", width=86, anchor='w')
+    tree.column("# 3", width=94, anchor='w')
     tree.heading("# 3", text=headline[2], anchor='w')
     tree.column("# 4", width=10, anchor='w')
     tree.heading("# 4", text=headline[3], anchor='w')
@@ -149,7 +166,7 @@ def draw_tree (root, app : app_lib.app_state):
     tree.config(yscrollcommand=vsb.set)
     tree.bind("<Double-1>", lambda event: OnDoubleClick(app, event))
 
-def settings (root : tk.Tk, app : app_lib.app_state) :
+def settings_ (root : tk.Tk, app : app_lib.app_state) :
     global p1, change, backup
 
     def get_data_dir (app : app_lib.app_state):
@@ -168,8 +185,7 @@ def settings (root : tk.Tk, app : app_lib.app_state) :
                 save_data_lib.save_settings_in_file(app)
                 win.destroy()
                 os.remove(f'{prew_dir}\BondMarket\data.pkl')
-                window(750, 550, True)
-
+                window(700, 550, True)
 
     def save_appearance (app : app_lib.app_state):
         if app.settings.appearance != sel_apperance.get():
@@ -194,24 +210,24 @@ def settings (root : tk.Tk, app : app_lib.app_state) :
             app.data_array = []
             update_screen(app)
 
-    tk.Label(root, text='Appearance:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=1, sticky='w', pady=5)
+    tk.Label(root, text='Appearance:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=1, sticky='w', pady=5, padx=1)
     
     sel_apperance = tk.StringVar()
     sel_apperance.set(app.settings.appearance)
-    ttk.Radiobutton(root, text='white', value='white', variable=sel_apperance).grid(row=2, sticky='w', pady=5)
-    ttk.Radiobutton(root, text='Dark', value='Dark', variable=sel_apperance).grid(row=3, sticky='w', pady=5)
+    ttk.Radiobutton(root, text='white', value='white', variable=sel_apperance).grid(row=2, sticky='w', pady=5, padx=1)
+    ttk.Radiobutton(root, text='Dark', value='Dark', variable=sel_apperance).grid(row=3, sticky='w', pady=5, padx=1)
 
-    tk.Label(root, text='Data Table:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=4, sticky='w', pady=5)
-    tk.Label(root, text='Month:', fg=text_color, bg=lab_color).grid(row=5, sticky='w', pady=5)
+    tk.Label(root, text='Data Table:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=4, sticky='w', pady=5, padx=1)
+    tk.Label(root, text='Month:', fg=text_color, bg=lab_color).grid(row=5, sticky='w', pady=5, padx=1)
     month = ttk.Combobox(root, values=tuple(x for x in ['all', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11' ,'12']))
-    month.grid(row=5,column=2,sticky='w', pady=5)
+    month.grid(row=5,column=2,sticky='w', pady=5, padx=1)
     month.insert(0, date.today().strftime("%m"))
-    tk.Label(root, text='Jear:', fg=text_color, bg=lab_color).grid(row=6, sticky='w', pady=5)
+    tk.Label(root, text='Jear:', fg=text_color, bg=lab_color).grid(row=6, sticky='w', pady=5, padx=1)
     jear = ttk.Combobox(root, values=tuple(x for x in range(2000, 2100)))
-    jear.grid(row=6,column=2,sticky='w', pady=5)
+    jear.grid(row=6,column=2,sticky='w', pady=5, padx=1)
     jear.insert(0, app.settings.jear)
 
-    tk.Label(root, text='Data Path:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=7, sticky='w', pady=5)
+    tk.Label(root, text='Data Path:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=7, sticky='w', pady=5, padx=1)
     p1 = tk.Label(root, text=f"{app.settings.data_dir_path}", fg=text_color, bg=lab_color)
     tk.Label(root, text=f"Default: ~/Documents", fg=text_color, bg=lab_color).place(x=1, y=290)
     p1.place(x=1, y=270)
@@ -226,7 +242,7 @@ def settings (root : tk.Tk, app : app_lib.app_state) :
     change.config(state='disabled')
     backup.config(state='disabled')
 
-def info (root) :
+def info_ (root) :
     def redirected_paypal ():
         if messagebox.askokcancel(title='Info',message='You will be redirected to paypal.com, do you want to continue?'):
             webbrowser.open('https://www.paypal.com/donate/?hosted_button_id=47BGH5AWNSV88', new=0, autoraise=True)
@@ -235,7 +251,7 @@ def info (root) :
     tk.Button(root, text='Donate', relief='flat', fg=text_color, bg=lab_color, activebackground=lab_color, command=redirected_paypal).pack(side='right', anchor='se', padx=3, pady=3)
     tk.Button(root, text='meith0717@gmail.com', relief='flat', fg=text_color, bg=lab_color, activebackground=lab_color, command=(lambda : messagebox.showinfo(title='Info',message='Mail-Adress copy to clipboard', options=clipboard.copy('meith0717@gmail.com')))).pack(side='left', anchor='sw', padx=3, pady=3)
 
-def tools (root : tk.Tk, app : app_lib.app_state):
+def tools_ (root : tk.Tk, app : app_lib.app_state):
     global s0, s1, s2, s3, s4, s5, s6, s7, s8, s9
     global d0, d1, d2, d3, d4, d5, d6, d7, d8, d9
     l : list = debts_lib.calc_expand(app)
@@ -280,34 +296,51 @@ def tools (root : tk.Tk, app : app_lib.app_state):
     d8.grid(row=20, column=0, sticky='w', pady=0, padx=2)
     d9 = tk.Label(root, text=s[9] , bg=bg_color, fg=text_color)
     d9.grid(row=11, column=0, sticky='w', pady=0, padx=2)
-    tk.Label(root, text='Total expenses:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=0, column=0, sticky='w', pady=0, padx=2)
-    tk.Label(root, text='Total debt:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=11, column=0, sticky='w', pady=0, padx=2)
-    ttk.Button(root, text='Export Text File', command=(lambda : export_txt_file.export(app))).grid(row=0, column=10, sticky='e')
+    tk.Label(root, text='Total expenses:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=0, column=0, sticky='w', pady=1, padx=2)
+    tk.Label(root, text='Total debt:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=11, column=0, sticky='w', pady=1, padx=2)
 
-def set_fullscreen(app : app_lib.app_state): 
-    if app.settings.fullscreen:
-        app.settings.fullscreen = False
+def entry_ (root : tk.Tk, app : app_lib.app_state):
+    # cavas ##############################################################################################
+    fields : list = ['Person:', 'Amount:', 'Coment:', 'Date:']
+    for i, field in enumerate(fields):
+        tk.Label(root, width=8, text=field, anchor='w', font=Font(family="Segoe UI", size=10), fg=text_color, bg=bg_color).grid(row=i, padx=2, pady=2,  sticky='e')
+    global combo1, e2, e3, e4
+    app_lib.find_names(app)
+    combo1 = ttk.Combobox(root, values=tuple(app_lib.find_names(app)), height=17, width=32)
+    combo1.grid(row=0, column=1, padx=2, pady=2, sticky='e')
+    e2 = ttk.Entry(root, font=Font(family="Segoe UI", size=10), width=30)
+    e2.grid(row=1, column=1, padx=2, pady=2, sticky='e')
+    e3 = ttk.Entry(root, font=Font(family="Segoe UI", size=10), width=30)
+    e3.grid(row=2, column=1, padx=2, pady=2, sticky='e')
+    e4 = ttk.Entry(root, font=Font(family="Segoe UI", size=10), width=30)
+    e4.grid(row=3, column=1, padx=2, pady=2, sticky='e')
+    if app.settings.month == 'all' or app.settings.month == date.today().strftime("%m"):
+        e4.insert(0, date.today().strftime("%Y.%m.%d"))
     else:
-        app.settings.fullscreen = True
-    win.attributes('-fullscreen', app.settings.fullscreen)
+        e4.insert(0, f"{app.settings.jear}.{app.settings.month}.01")
+    # Buttons ##############################################################################################
+    ttk.Button(root, text='Add',width=5,command=(lambda : safe_to_dataarray(app))).grid(row=1, column=5, padx=12, pady=2)
+    ttk.Button(root, text='Delet',width=5, command=(lambda : delet_from_dataarray(app))).grid(row=2, column=5, padx=12, pady=2)
+    ttk.Button(root, text='Clear',width=5, command=(lambda : clear(app))).grid(row=3, column=5, padx=12, pady=2)
 
-def center_window(root : tk.Tk, w=300, h=200):
-    # get screen width and height
-    ws = root.winfo_screenwidth()
-    hs = root.winfo_screenheight()
-    # calculate position x, y
-    x = (ws/2) - (w/2)    
-    y = (hs/2) - (h/2)
-    root.geometry('%dx%d+%d+%d' % (w, h, x, y))
+def button_ (root : tk.Tk, app : app_lib.app_state):
+    ttk.Button(root, text='Exit', width=5, command=(lambda : exit(win, app))).pack(side='right', anchor='s', padx=5)
+    ttk.Button(root, text='Save', width=5, command=(lambda : save(app))).pack(side='right', anchor='s', padx=5)
+    ttk.Button(root, text='Create PDF', command=(lambda : export_txt_file.export(app))).pack(side='right', anchor='s', padx=5, fill='x')
+    tk.Label(root, text='Please use exit button, otherwise data loss may occur', bg=bg_color, fg='red').pack(side='left', padx=50)
 
 def window (winx : int, winy : int, restart : bool):
+    '''This is the main function that creates the window.'''
 
-    global bg_color, text_color, lab_color, win
+    global bg_color, text_color, lab_color, win, data_frame
+
+    # Initializes the main class and loads the data from the files
     app = app_lib.app_state([], {}, True)
     save_data_lib.read_settings_from_file(app)
     save_data_lib.read_data_from_file(app)
     win = ThemedTk()
-    center_window(win, winx, winy)
+
+    # Checks the setting whether the appearance is set to Dark or Light
     if app.settings.appearance == 'white':
         bg_color = None
         text_color = 'black'
@@ -318,66 +351,49 @@ def window (winx : int, winy : int, restart : bool):
         text_color = 'white'
         lab_color = '#424242'
     
-    # Window settings ##############################################################################################
-    win.title('BondMarket')
+    # Set some window settings 
+    win.title('')
     win.wm_attributes('-toolwindow', 'True')
     win.config(bg=bg_color)
     win.attributes('-fullscreen', app.settings.fullscreen)
     win.geometry(f'{winx}x{winy}')
-    win.minsize(750, 550)
-    # Frames ##############################################################################################
-    global data_frame
-    data_frame = tk.LabelFrame(win, text="Data Table", fg=text_color, bg=bg_color)
-    entry_frame = tk.LabelFrame(win, text="Enty Data", fg=text_color, bg=bg_color)
-    more_frame = tk.LabelFrame(win, text="Menue", fg=text_color, bg=bg_color)
-    # Descriptions ##############################################################################################
-    tk.Label(win, text='Python 3.10.1     %s    Version %s' %(code_copyright,code_version), font=Font(family="Segoe UI", size=8), fg=text_color, bg=bg_color, width=5000).pack(side='bottom', fill='x')
-    # Table ##############################################################################################
-    draw_tree(data_frame, app)
-    # Tabs ###############################################################################################
-    tab = ttk.Notebook(more_frame)
-    tab1 = ttk.Frame(tab)
-    tab2 = ttk.Frame(tab) 
-    tab3 = ttk.Frame(tab) 
-    tab.add(tab1, text ='     Tools     ')
-    tools(tab1, app)
-    tab.add(tab2, text ='    Settings   ')
-    settings(tab2, app)
-    tab.add(tab3, text ='   Help/Info   ')
-    info(tab3)
-    tab.pack(side='left', fill='both', padx=5, pady=5)
-    # cavas ##############################################################################################
-    fields : list = ['Person:', 'Amount:', 'Coment:', 'Date:']
-    for i, field in enumerate(fields):
-        tk.Label(entry_frame, width=8, text=field, anchor='w', font=Font(family="Segoe UI", size=10), fg=text_color, bg=bg_color).grid(row=i, padx=2, pady=2,  sticky='e')
-    global combo1, e2, e3, e4
-    app_lib.find_names(app)
-    combo1 = ttk.Combobox(entry_frame, values=tuple(app_lib.find_names(app)), width=25)
-    combo1.grid(row=0, column=1, padx=2, pady=2, sticky='e')
-    e2 = ttk.Entry(entry_frame, font=Font(family="Segoe UI", size=10), width=25)
-    e2.grid(row=1, column=1, padx=2, pady=2, sticky='e')
-    e3 = ttk.Entry(entry_frame, font=Font(family="Segoe UI", size=10), width=25)
-    e3.grid(row=2, column=1, padx=2, pady=2, sticky='e')
-    e4 = ttk.Entry(entry_frame, font=Font(family="Segoe UI", size=10), width=25)
-    e4.grid(row=3, column=1, padx=2, pady=2, sticky='e')
-    if app.settings.month == 'all' or app.settings.month == date.today().strftime("%m"):
-        e4.insert(0, date.today().strftime("%Y.%m.%d"))
-    else:
-        e4.insert(0, f"{app.settings.jear}.{app.settings.month}.01")
-    # Buttons ##############################################################################################
-    ttk.Button(entry_frame, text='Add',width=5,command=(lambda : safe_to_dataarray(app))).grid(row=1, column=5, padx=10, pady=2)
-    ttk.Button(entry_frame, text='Delet',width=5, command=(lambda : delet_from_dataarray(app))).grid(row=2, column=5, padx=10, pady=2)
-    ttk.Button(entry_frame, text='Clear',width=5, command=(lambda : clear(app))).grid(row=3, column=5, padx=10, pady=2)
-    ttk.Button(entry_frame, text='Save', width=5, command=(lambda : save(app))).grid(row=2, column=6, padx=10, pady=2)
-    ttk.Button(entry_frame, text='Exit', width=5, command=(lambda : exit(win, app))).grid(row=3, column=6, padx=10, pady=2)
-    # Keyboard ###############################################################################################
+    win.minsize(700, 550)
+    center_window(win, winx, winy)
+
+    # Define some frames and set preferences
+    data_frame = tk.Frame(win, bg=bg_color, relief='flat')
+    entry_frame = tk.Frame(win, bg=bg_color, relief='flat')
+    more_frame = tk.Frame(win, bg=bg_color, relief='flat')
+    button_frame = tk.Frame(win, bg=bg_color, relief='flat')
+    tabs = ttk.Notebook(more_frame)
+    tab1 = ttk.Frame(tabs, relief='flat')
+    tab2 = ttk.Frame(tabs, relief='flat') 
+    tab3 = ttk.Frame(tabs, relief='flat') 
+    tabs.add(tab1, text ='     Tools     ')
+    tabs.add(tab2, text ='    Settings   ')
+    tabs.add(tab3, text ='   Help/Info   ')
+    tabs.pack(side='left', fill='both', padx=5, pady=5)
+
+    # Set a few keyboard shortcuts
     win.bind('<Control-s>', lambda event: save(app))
     win.bind('<F11>', lambda event: set_fullscreen(app))
     win.bind('<Escape>', lambda event: exit(win, app))
     win.bind('<Return>', lambda event: safe_to_dataarray(app))
     win.bind('<t>', lambda event: debts_lib.get_transfere_str(app))
-    # Place some Frames ######################################################################################
-    more_frame.pack(side='right', anchor='e', padx=1, pady=1, fill='both')
-    entry_frame.pack(side='bottom', anchor='sw', padx=1, pady=1, fill='both')
-    data_frame.pack(side='top', anchor='nw', padx=1, pady=1, fill='both')
+
+    # A few functions
+    table_(data_frame, app)
+    entry_(entry_frame, app)
+    tools_(tab1, app)
+    settings_(tab2, app)
+    info_(tab3)
+    button_(button_frame, app)
+
+    # Place some Frames 
+    tk.Label(win, text='Python 3.10.1     %s    Version %s' %(code_copyright,code_version), font=Font(family="Segoe UI", size=8), fg=text_color, bg=bg_color, width=5000).pack(side='bottom', fill='x')
+    button_frame.pack(side='bottom', anchor='se', fill='x')
+    more_frame.pack(side='right', padx=2, pady=2, fill='y')
+    tk.Label(win, text='BondMarket', font=Font(family="Segoe UI", size=17), fg=text_color, bg=bg_color).pack(side='top', anchor='sw', padx=2, pady=2)
+    entry_frame.pack(side='bottom', anchor='w', padx=2, pady=2, fill='both')
+    data_frame.pack(side='top', anchor='nw', padx=2, pady=2, fill='both')
     win.mainloop()
