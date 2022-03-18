@@ -11,5 +11,5 @@ def create_backup (app : app_lib.app_state):
     except FileExistsError:
         pass
     path = f'{path}\BondMarket_Backup'
-    save_data_lib.save_in_pkl(f'{datetime.now().strftime("%S.%M.%H %d.%m.%Y")} data.pkl', app.data_array, path)
-    messagebox.showinfo(title='Info:', message=f'{datetime.now().strftime("%S.%M.%H %d.%m.%Y")} data.pkl and {datetime.now().strftime("%S.%M.%H %d.%m.%Y")} config.pkl were generated in {path}.')
+    save_data_lib.save_in_pkl(f'{path}/{datetime.now().strftime("%S.%M.%H %d.%m.%Y")} data.pkl', app.data_array)
+    messagebox.showinfo(title='Info:', message=f'{datetime.now().strftime("%S.%M.%H %d.%m.%Y")} data.pkl were generated in {path}.')

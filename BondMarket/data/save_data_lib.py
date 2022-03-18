@@ -1,20 +1,22 @@
+import filecmp
 import pickle
 import os
 from datetime import date
+from typing import Any
 from app import app_lib
 
 def check_if_dir_exist (path : str):
-    if os.path.isdir(f"{path}\BondMarket") is False:
-        os.mkdir(f"{path}\BondMarket")
+    if os.path.isdir(f"{path}/BondMarket") is False:
+        os.mkdir(f"{path}/BondMarket")
 
-def save_in_pkl (filename : str, data : list or dict, path : str) -> None:
-    file = open(f"{path}\{filename}", "wb")
+def save_in_pkl (file_path : str, data : list or dict,) -> None:
+    file = open(file_path, "wb")
     pickle.dump(data, file)
     file.close()
 
-def read_from_pkl (filename : str, path : str) -> dict:
+def read_from_pkl (file_path : str) -> Any:
     try:
-        file = open(f"{path}\{filename}", "rb")
+        file = open(file_path, "rb")
         settings_dict : dict = pickle.load(file)
         file.close()
     except FileNotFoundError:
@@ -22,21 +24,20 @@ def read_from_pkl (filename : str, path : str) -> dict:
     return settings_dict
 
 def save_settings_in_file (app : app_lib.app_state) -> None:
-    check_if_dir_exist(os.path.expanduser("~\Documents"))
-    save_in_pkl('config.pkl', app.settings, os.path.expanduser('~\Documents\BondMarket'))
+    save_in_pkl(f"{os.path.expanduser('~/Documents/BondMarket')}/config.pkl", app.settings)
 
 def read_settings_from_file (app : app_lib.app_state) -> None:
-    if read_from_pkl('config.pkl', os.path.expanduser('~\Documents\BondMarket')) == False:
-        app.settings = app_lib.settings(os.path.expanduser('~\Documents'), 'white', date.today().strftime("%Y"), date.today().strftime("%m"))
+    if read_from_pkl(f"{os.path.expanduser('~/Documents/BondMarket')}/config.pkl") == False:
+        check_if_dir_exist(os.path.expanduser("~/Documents"))
+        app.settings = app_lib.settings(f"{os.path.expanduser('~/Documents/BondMarket')}/data.pkl", 'white', date.today().strftime("%Y"), date.today().strftime("%m"))
     else:
-        app.settings = read_from_pkl('config.pkl', os.path.expanduser('~\Documents\BondMarket'))
+        app.settings = read_from_pkl(f"{os.path.expanduser('~/Documents/BondMarket')}/config.pkl")
 
 def save_data_in_file (app : app_lib.app_state) -> None:
-    check_if_dir_exist(app.settings.data_dir_path)
-    save_in_pkl('data.pkl', app.data_array, f"{app.settings.data_dir_path}\BondMarket")
+    save_in_pkl(app.settings.data_path, app.data_array)
 
 def read_data_from_file (app : app_lib.app_state) -> None:
-    if read_from_pkl('data.pkl', f"{app.settings.data_dir_path}\BondMarket") == False:
+    if read_from_pkl(app.settings.data_path) == False:
         app.data_array = []
     else:
-        app.data_array = read_from_pkl('data.pkl', f"{app.settings.data_dir_path}\BondMarket")
+        app.data_array = read_from_pkl(app.settings.data_path)

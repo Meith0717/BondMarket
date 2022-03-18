@@ -1,6 +1,6 @@
 code_autor = "Thierry Meiers"
 code_copyright = "Copyright © 2022 Thierry Meiers"
-code_version = "3.8.1"
+code_version = "4.0"
 
 import tkinter as tk
 import os
@@ -31,7 +31,7 @@ def update_screen(app : app_lib.app_state):
     else:
         e4.insert(0, f"{app.settings.jear}.{app.settings.month}.01")
 
-    p1.config(text=f"{app.settings.data_dir_path}")
+    p1.config(text=f"{app.settings.data_path}")
 
     if app.safe_state_data is True:
         change.config(state='enabled')
@@ -118,7 +118,6 @@ def clear (app : app_lib.app_state):
     else:
         e4.insert(0, f"{app.settings.jear}.{app.settings.month}.01")
 
-
 def center_window(root : tk.Tk, w=300, h=200):
     # get screen width and height
     ws = root.winfo_screenwidth()
@@ -161,23 +160,21 @@ def table_ (root, app : app_lib.app_state):
 def settings_ (root : tk.Tk, app : app_lib.app_state) :
     global p1, change, backup
 
+    def restore_backup(app : app_lib.app_state):
+        if messagebox.askyesno('Warning', 'Are you sure you want to recover the data? Data can be lost'):
+            path = filedialog.askopenfilename()
+            app.data_array = save_data_lib.read_from_pkl(path)
+            update_screen(app)
+
     def get_data_dir (app : app_lib.app_state):
-        prew_dir = app.settings.data_dir_path
-        app.settings.data_dir_path = filedialog.askdirectory()
-        if app.settings.data_dir_path == '':
-            app.settings.data_dir_path = prew_dir
-        elif prew_dir == 'na':
-            pass
+        prew_dir = app.settings.data_path
+        app.settings.data_path = filedialog.askopenfilename()
+        if app.settings.data_path == '':
+            app.settings.data_path = prew_dir
         else:
-            save_data_lib.check_if_dir_exist(app.settings.data_dir_path)
-            try:
-                os.rename(f'{prew_dir}\BondMarket\data.pkl' ,f'{app.settings.data_dir_path}\BondMarket\data.pkl')
-                save(app)
-            except FileExistsError:
-                save_data_lib.save_settings_in_file(app)
-                win.destroy()
-                os.remove(f'{prew_dir}\BondMarket\data.pkl')
-                window(700, 550, True)
+            save_data_lib.save_settings_in_file(app)
+            win.destroy()
+            window(700, 550, True)
 
     def save_appearance (app : app_lib.app_state):
         if app.settings.appearance != sel_apperance.get():
@@ -220,7 +217,7 @@ def settings_ (root : tk.Tk, app : app_lib.app_state) :
     jear.insert(0, app.settings.jear)
 
     tk.Label(root, text='Data Path:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=7, sticky='w', pady=5, padx=1)
-    p1 = tk.Label(root, text=f"{app.settings.data_dir_path}", fg=text_color, bg=lab_color)
+    p1 = tk.Label(root, text=f"{app.settings.data_path}", fg=text_color, bg=lab_color)
     tk.Label(root, text=f"Default: ~/Documents", fg=text_color, bg=lab_color).place(x=1, y=290)
     p1.place(x=1, y=270)
 
@@ -229,8 +226,9 @@ def settings_ (root : tk.Tk, app : app_lib.app_state) :
     ttk.Button(root, text='Apply', command=(lambda : save_filter(app))).grid(row=5, column=10, padx=5, pady=5)
     backup = ttk.Button(root, text='Create Backup', command=(lambda : create_backup_file.create_backup(app)))
     backup.grid(row=8, column=0, padx=5, pady=5)
-    change = ttk.Button(root, text='Change', command=(lambda : get_data_dir(app)))
-    change.grid(row=9, column=10, padx=5, pady=5)
+    change = ttk.Button(root, text='Open File', command=(lambda : get_data_dir(app)))
+    ttk.Button(root, text='Restore', command=(lambda : restore_backup(app))).grid(row=8, column=10, padx=5, pady=5)
+    change.grid(row=7, column=10, padx=5, pady=5)
     change.config(state='disabled')
     backup.config(state='disabled')
 

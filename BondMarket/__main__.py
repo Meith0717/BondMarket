@@ -1,7 +1,7 @@
 __author__ = "Thierry Meiers"
 __copyright__ = "Copyright © 2022 Thierry Meiers"
 __license__ = "Apache License 2.0"
-__version__ = "3.8.1"
+__version__ = "4.0"
 
 from gui import gui_lib
 

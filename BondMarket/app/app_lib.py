@@ -9,7 +9,7 @@ class data:
 
 @dataclass
 class settings:
-    data_dir_path   : str
+    data_path       : str
     appearance      : str
     jear            : int
     month           : int
