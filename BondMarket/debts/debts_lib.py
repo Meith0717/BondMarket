@@ -65,15 +65,15 @@ def get_transfere_str (app : app_lib.app_state):
     l : list = calc(app)
     s : list = []
     if len(l) > 1:
-        s += [f"{l[0].name[:-4]} -> {l[0].transfer} -> {l[1].name[:-4]}"]
+        s += [f"    {l[0].name[:-4]} -> {l[0].transfer} -> {l[1].name[:-4]}"]
         if len(l) > 2:
             for i in range(1, len(l)-1):
                 d0 : debts = l[i]
                 d1 : debts = l[i+1]
-                s += [f"{d0.name[:-4]} --> {d0.transfer} --> {d1.name[:-4]}"]
+                s += [f"    {d0.name[:-4]} --> {d0.transfer} --> {d1.name[:-4]}"]
         
         return expand(10, s, '')
-    s = ['More than 1 person must be stored']
+    s = ['  More than 1 person must be stored']
     return expand(10, s, '')
 
 def calc_expand (app : app_lib.app_state):

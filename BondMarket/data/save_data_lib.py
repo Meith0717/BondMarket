@@ -1,4 +1,3 @@
-import filecmp
 import pickle
 import os
 from datetime import date

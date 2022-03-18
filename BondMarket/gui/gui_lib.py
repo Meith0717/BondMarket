@@ -64,7 +64,7 @@ def update_screen(app : app_lib.app_state):
     d9.config(text=s[9])
 
 def safe_to_dataarray (app : app_lib.app_state):
-    if len(app_lib.find_names(app))+1 > 10:
+    if len(app_lib.find_names(app))+1 > 10 and combo1.get() not in app_lib.find_names(app):
         messagebox.showwarning('Warning', 'Name Error: Only 10 persons are allowed')
     else:
         if combo1.get() == ''  or e3.get() == '':
@@ -162,13 +162,14 @@ def settings_ (root : tk.Tk, app : app_lib.app_state) :
 
     def restore_backup(app : app_lib.app_state):
         if messagebox.askyesno('Warning', 'Are you sure you want to recover the data? Data can be lost'):
-            path = filedialog.askopenfilename()
-            app.data_array = save_data_lib.read_from_pkl(path)
-            update_screen(app)
+            path = filedialog.askopenfilename(filetypes=[('PKL', '.pkl')])
+            if path != '':
+                app.data_array = save_data_lib.read_from_pkl(path)
+                update_screen(app)
 
     def get_data_dir (app : app_lib.app_state):
         prew_dir = app.settings.data_path
-        app.settings.data_path = filedialog.askopenfilename()
+        app.settings.data_path = filedialog.askopenfilename(filetypes=[('PKL', '.pkl')])
         if app.settings.data_path == '':
             app.settings.data_path = prew_dir
         else:
@@ -247,45 +248,45 @@ def tools_ (root : tk.Tk, app : app_lib.app_state):
     l : list = debts_lib.calc_expand(app)
     s : list = debts_lib.get_transfere_str(app)
     s0 = tk.Label(root, text= f"{l[0].name}{l[0].amount}" , bg=bg_color, fg=text_color)
-    s0.grid(row=1, column=0, sticky='w', pady=0, padx=2)
+    s0.grid(row=1, column=0, sticky='w', pady=0, padx=30)
     s1 = tk.Label(root, text= f"{l[1].name}{l[1].amount}" , bg=bg_color, fg=text_color)
-    s1.grid(row=2, column=0, sticky='w', pady=0, padx=2)
+    s1.grid(row=2, column=0, sticky='w', pady=0, padx=30)
     s2 = tk.Label(root, text= f"{l[2].name}{l[2].amount}" , bg=bg_color, fg=text_color)
-    s2.grid(row=3, column=0, sticky='w', pady=0, padx=2)
+    s2.grid(row=3, column=0, sticky='w', pady=0, padx=30)
     s3 = tk.Label(root, text= f"{l[3].name}{l[3].amount}" , bg=bg_color, fg=text_color)
-    s3.grid(row=4, column=0, sticky='w', pady=0, padx=2)
+    s3.grid(row=4, column=0, sticky='w', pady=0, padx=30)
     s4 = tk.Label(root, text= f"{l[4].name}{l[4].amount}" , bg=bg_color, fg=text_color)
-    s4.grid(row=5, column=0, sticky='w', pady=0, padx=2)
+    s4.grid(row=5, column=0, sticky='w', pady=0, padx=30)
     s5 = tk.Label(root, text= f"{l[5].name}{l[5].amount}" , bg=bg_color, fg=text_color)
-    s5.grid(row=6, column=0, sticky='w', pady=0, padx=2)
+    s5.grid(row=6, column=0, sticky='w', pady=0, padx=30)
     s6 = tk.Label(root, text= f"{l[6].name}{l[6].amount}" , bg=bg_color, fg=text_color)
-    s6.grid(row=7, column=0, sticky='w', pady=0, padx=2)
+    s6.grid(row=7, column=0, sticky='w', pady=0, padx=30)
     s7 = tk.Label(root, text= f"{l[7].name}{l[7].amount}" , bg=bg_color, fg=text_color)
-    s7.grid(row=8, column=0, sticky='w', pady=0, padx=2)
+    s7.grid(row=8, column=0, sticky='w', pady=0, padx=30)
     s8 = tk.Label(root, text= f"{l[8].name}{l[8].amount}" , bg=bg_color, fg=text_color)
-    s8.grid(row=9, column=0, sticky='w', pady=0, padx=2)
+    s8.grid(row=9, column=0, sticky='w', pady=0, padx=30)
     s9 = tk.Label(root, text= f"{l[9].name}{l[9].amount}" , bg=bg_color, fg=text_color)
-    s9.grid(row=10, column=0, sticky='w', pady=0, padx=2)
+    s9.grid(row=10, column=0, sticky='w', pady=0, padx=30)
     d0 = tk.Label(root, text=s[0], bg=bg_color, fg=text_color)
-    d0.grid(row=12, column=0, sticky='w', pady=0, padx=2)
+    d0.grid(row=12, column=0, sticky='w', pady=0, padx=30)
     d1 = tk.Label(root, text=s[1], bg=bg_color, fg=text_color)
-    d1.grid(row=13, column=0, sticky='w', pady=0, padx=2)
+    d1.grid(row=13, column=0, sticky='w', pady=0, padx=30)
     d2 = tk.Label(root, text=s[2] , bg=bg_color, fg=text_color)
-    d2.grid(row=14, column=0, sticky='w', pady=0, padx=2)
+    d2.grid(row=14, column=0, sticky='w', pady=0, padx=30)
     d3 = tk.Label(root, text=s[3] , bg=bg_color, fg=text_color)
-    d3.grid(row=15, column=0, sticky='w', pady=0, padx=2)
+    d3.grid(row=15, column=0, sticky='w', pady=0, padx=30)
     d4 = tk.Label(root, text=s[4], bg=bg_color, fg=text_color)
-    d4.grid(row=16, column=0, sticky='w', pady=0, padx=2)
+    d4.grid(row=16, column=0, sticky='w', pady=0, padx=30)
     d5 = tk.Label(root, text=s[5] , bg=bg_color, fg=text_color)
-    d5.grid(row=17, column=0, sticky='w', pady=0, padx=2)
+    d5.grid(row=17, column=0, sticky='w', pady=0, padx=30)
     d6 = tk.Label(root, text=s[6] , bg=bg_color, fg=text_color)
-    d6.grid(row=18, column=0, sticky='w', pady=0, padx=2)
+    d6.grid(row=18, column=0, sticky='w', pady=0, padx=30)
     d7 = tk.Label(root, text=s[7] , bg=bg_color, fg=text_color)
-    d7.grid(row=19, column=0, sticky='w', pady=0, padx=2)
+    d7.grid(row=19, column=0, sticky='w', pady=0, padx=30)
     d8 = tk.Label(root, text=s[8] , bg=bg_color, fg=text_color)
-    d8.grid(row=20, column=0, sticky='w', pady=0, padx=2)
+    d8.grid(row=20, column=0, sticky='w', pady=0, padx=30)
     d9 = tk.Label(root, text=s[9] , bg=bg_color, fg=text_color)
-    d9.grid(row=11, column=0, sticky='w', pady=0, padx=2)
+    d9.grid(row=11, column=0, sticky='w', pady=0, padx=30)
     tk.Label(root, text='Total expenses:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=0, column=0, sticky='w', pady=1, padx=2)
     tk.Label(root, text='Total debt:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=11, column=0, sticky='w', pady=1, padx=2)
 
