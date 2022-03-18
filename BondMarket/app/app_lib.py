@@ -11,7 +11,6 @@ class data:
 class settings:
     data_dir_path   : str
     appearance      : str
-    fullscreen      : bool
     jear            : int
     month           : int
 

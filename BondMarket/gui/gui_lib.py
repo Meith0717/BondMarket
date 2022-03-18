@@ -118,6 +118,7 @@ def clear (app : app_lib.app_state):
     else:
         e4.insert(0, f"{app.settings.jear}.{app.settings.month}.01")
 
+
 def center_window(root : tk.Tk, w=300, h=200):
     # get screen width and height
     ws = root.winfo_screenwidth()
@@ -126,15 +127,6 @@ def center_window(root : tk.Tk, w=300, h=200):
     x = (ws/2) - (w/2)    
     y = (hs/2) - (h/2)
     root.geometry('%dx%d+%d+%d' % (w, h, x, y))
-
-def set_fullscreen(app : app_lib.app_state) -> None: 
-    '''Checks the settings whether the full
-     screen setting is set to true or false.'''
-    if app.settings.fullscreen:
-        app.settings.fullscreen = False
-    else:
-        app.settings.fullscreen = True
-    win.attributes('-fullscreen', app.settings.fullscreen)
 
 def table_ (root, app : app_lib.app_state):
     global tree
@@ -355,7 +347,6 @@ def window (winx : int, winy : int, restart : bool):
     win.title('')
     win.wm_attributes('-toolwindow', 'True')
     win.config(bg=bg_color)
-    win.attributes('-fullscreen', app.settings.fullscreen)
     win.geometry(f'{winx}x{winy}')
     win.minsize(700, 550)
     center_window(win, winx, winy)
@@ -376,7 +367,6 @@ def window (winx : int, winy : int, restart : bool):
 
     # Set a few keyboard shortcuts
     win.bind('<Control-s>', lambda event: save(app))
-    win.bind('<F11>', lambda event: set_fullscreen(app))
     win.bind('<Escape>', lambda event: exit(win, app))
     win.bind('<Return>', lambda event: safe_to_dataarray(app))
     win.bind('<t>', lambda event: debts_lib.get_transfere_str(app))

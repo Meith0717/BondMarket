@@ -27,7 +27,7 @@ def save_settings_in_file (app : app_lib.app_state) -> None:
 
 def read_settings_from_file (app : app_lib.app_state) -> None:
     if read_from_pkl('config.pkl', os.path.expanduser('~\Documents\BondMarket')) == False:
-        app.settings = app_lib.settings(os.path.expanduser('~\Documents'), 'white', False, date.today().strftime("%Y"), date.today().strftime("%m"))
+        app.settings = app_lib.settings(os.path.expanduser('~\Documents'), 'white', date.today().strftime("%Y"), date.today().strftime("%m"))
     else:
         app.settings = read_from_pkl('config.pkl', os.path.expanduser('~\Documents\BondMarket'))
 
