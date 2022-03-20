@@ -3,7 +3,6 @@ code_copyright = "Copyright © 2022 Thierry Meiers"
 code_version = "4.0"
 
 import tkinter as tk
-import os
 import clipboard 
 import webbrowser
 from tkinter import ttk, filedialog
@@ -13,7 +12,7 @@ from tkinter import messagebox
 from app import app_lib
 from data import save_data_lib, create_backup_file, export_txt_file
 from datetime import date
-from debts import debts_lib
+from calculations import debts_lib
 
 def update_screen(app : app_lib.app_state):
     combo1.config(values=tuple(app_lib.find_names(app)))
@@ -64,23 +63,22 @@ def update_screen(app : app_lib.app_state):
     d9.config(text=s[9])
 
 def safe_to_dataarray (app : app_lib.app_state):
+    if combo1.get() == ''  or e3.get() == '':
+        return
     if len(app_lib.find_names(app))+1 > 10 and combo1.get() not in app_lib.find_names(app):
         messagebox.showwarning('Warning', 'Name Error: Only 10 persons are allowed')
     else:
-        if combo1.get() == ''  or e3.get() == '':
-            pass
-        else:
-            try:
-                name : str = combo1.get()
-                amount : float = str(float(e2.get()))
-                comment : str = e3.get()
-                date : str = e4.get()
-                app_lib.push_to_data_array(app, name, amount, comment, date)
-                tree.insert('', 0, values=(combo1.get(), e2.get(), e3.get(), e4.get()))
-                clear(app)
-                update_screen(app)
-            except ValueError:
-                messagebox.showerror('Error', message='Amount Error: Please enter a Number')
+        try:
+            name : str = combo1.get()
+            amount : float = str(float(e2.get()))
+            comment : str = e3.get()
+            date : str = e4.get()
+            app_lib.push_to_data_array(app, name, amount, comment, date)
+            tree.insert('', 0, values=(combo1.get(), e2.get(), e3.get(), e4.get()))
+            clear(app)
+            update_screen(app)
+        except ValueError:
+            messagebox.showerror('Error', message='Amount Error: Please enter a Number')
 
 def delet_from_dataarray (app : app_lib.app_state):
     app_lib.pop_from_data_array(app, combo1.get(), e2.get(), e3.get(), e4.get())
@@ -96,11 +94,14 @@ def OnDoubleClick(app: app_lib.app_state, event):
     global e5
     clear(app)
     curItem = tree.item(tree.focus())
-    combo1.insert(0, curItem['values'][0])
-    e2.insert(0, curItem['values'][1])
-    e3.insert(0, curItem['values'][2])
-    e4.delete(0, 100)
-    e4.insert(0, curItem['values'][3])
+    try:
+        combo1.insert(0, curItem['values'][0])
+        e2.insert(0, curItem['values'][1])
+        e3.insert(0, curItem['values'][2])
+        e4.delete(0, 100)
+        e4.insert(0, curItem['values'][3])
+    except IndexError:
+        pass
 
 def save (app : app_lib.app_state):
     app.safe_state_data = True
@@ -117,6 +118,18 @@ def clear (app : app_lib.app_state):
         e4.insert(0, date.today().strftime("%Y.%m.%d"))
     else:
         e4.insert(0, f"{app.settings.jear}.{app.settings.month}.01")
+
+def get_data_path (app : app_lib.app_state):
+    if app.safe_state_data is False:
+        return
+    prew_path = app.settings.data_path
+    app.settings.data_path = filedialog.askopenfilename(filetypes=[('PKL', '.pkl')])
+    if app.settings.data_path == '' or prew_path == app.settings.data_path:
+        app.settings.data_path = prew_path
+    else:
+        save_data_lib.save_settings_in_file(app)
+        win.destroy()
+        window(700, 550, True)
 
 def center_window(root : tk.Tk, w=300, h=200):
     # get screen width and height
@@ -139,9 +152,9 @@ def table_ (root, app : app_lib.app_state):
     tree.heading("# 1", text=headline[0], anchor='w')
     tree.column("# 2", width=8, anchor='w')
     tree.heading("# 2", text=headline[1], anchor='w')
-    tree.column("# 3", width=94, anchor='w')
+    tree.column("# 3", width=89, anchor='w')
     tree.heading("# 3", text=headline[2], anchor='w')
-    tree.column("# 4", width=10, anchor='w')
+    tree.column("# 4", width=15, anchor='w')
     tree.heading("# 4", text=headline[3], anchor='w')
 
     for d in app.data_array:
@@ -151,7 +164,6 @@ def table_ (root, app : app_lib.app_state):
             if f"{app.settings.jear}.{app.settings.month}" in d.date:
                 tree.insert('', 'end', values=(d.person_name, d.amount, d.comment, d.date)) 
 
-        
     vsb.pack(side='right', anchor='se', fill='y', pady=1, padx=0)
     tree.pack(fill='both', padx=2, pady=2)
     tree.config(yscrollcommand=vsb.set)
@@ -166,16 +178,6 @@ def settings_ (root : tk.Tk, app : app_lib.app_state) :
             if path != '':
                 app.data_array = save_data_lib.read_from_pkl(path)
                 update_screen(app)
-
-    def get_data_dir (app : app_lib.app_state):
-        prew_dir = app.settings.data_path
-        app.settings.data_path = filedialog.askopenfilename(filetypes=[('PKL', '.pkl')])
-        if app.settings.data_path == '':
-            app.settings.data_path = prew_dir
-        else:
-            save_data_lib.save_settings_in_file(app)
-            win.destroy()
-            window(700, 550, True)
 
     def save_appearance (app : app_lib.app_state):
         if app.settings.appearance != sel_apperance.get():
@@ -218,6 +220,8 @@ def settings_ (root : tk.Tk, app : app_lib.app_state) :
     jear.insert(0, app.settings.jear)
 
     tk.Label(root, text='Data Path:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=7, sticky='w', pady=5, padx=1)
+    tk.Label(root, text='Save to enable Button', font=Font(family="Segoe UI", size=8), fg=text_color, bg=lab_color).grid(row=8,column=2, sticky='w', pady=5, padx=1)
+
     p1 = tk.Label(root, text=f"{app.settings.data_path}", fg=text_color, bg=lab_color)
     tk.Label(root, text=f"Default: ~/Documents", fg=text_color, bg=lab_color).place(x=1, y=290)
     p1.place(x=1, y=270)
@@ -225,22 +229,45 @@ def settings_ (root : tk.Tk, app : app_lib.app_state) :
     ttk.Button(root, text='Apply', command=(lambda : save_appearance(app))).grid(row=1, column=10, padx=5, pady=5)
     ttk.Button(root, text='Clear Data', command=(lambda : clear(app))).grid(row=4, column=10, padx=5, pady=5)
     ttk.Button(root, text='Apply', command=(lambda : save_filter(app))).grid(row=5, column=10, padx=5, pady=5)
+    ttk.Button(root, text='Restore', command=(lambda : restore_backup(app))).grid(row=8, column=10, padx=5, pady=5)
     backup = ttk.Button(root, text='Create Backup', command=(lambda : create_backup_file.create_backup(app)))
     backup.grid(row=8, column=0, padx=5, pady=5)
-    change = ttk.Button(root, text='Open File', command=(lambda : get_data_dir(app)))
-    ttk.Button(root, text='Restore', command=(lambda : restore_backup(app))).grid(row=8, column=10, padx=5, pady=5)
+    change = ttk.Button(root, text='Open File', command=(lambda : get_data_path(app)))
     change.grid(row=7, column=10, padx=5, pady=5)
     change.config(state='disabled')
     backup.config(state='disabled')
 
 def info_ (root) :
-    def redirected_paypal ():
-        if messagebox.askokcancel(title='Info',message='You will be redirected to paypal.com, do you want to continue?'):
-            webbrowser.open('https://www.paypal.com/donate/?hosted_button_id=47BGH5AWNSV88', new=0, autoraise=True)
- 
-    tk.Label(root, text='Not yet implemented', fg='red', bg=lab_color).place(x=2, y=25)
-    tk.Button(root, text='Donate', relief='flat', fg=text_color, bg=lab_color, activebackground=lab_color, command=redirected_paypal).pack(side='right', anchor='se', padx=3, pady=3)
-    tk.Button(root, text='meith0717@gmail.com', relief='flat', fg=text_color, bg=lab_color, activebackground=lab_color, command=(lambda : messagebox.showinfo(title='Info',message='Mail-Adress copy to clipboard', options=clipboard.copy('meith0717@gmail.com')))).pack(side='left', anchor='sw', padx=3, pady=3)
+   
+    def open_link (link : str):
+        if messagebox.askokcancel(title='Info',message=f"You will be redirected to {link}, do you want to continue?"):
+            webbrowser.open(link, new=0, autoraise=True)
+
+    tk.Label(root, text='Shortcuts:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=0, column=0, sticky='w')
+
+    tk.Label(root, text='Save Entry:', background=bg_color, fg=text_color).grid(row=1, column=0, sticky='w')
+    tk.Label(root, text='ENTER', background=bg_color, fg=text_color).grid(row=1, column=1, sticky='w')
+
+    tk.Label(root, text='Delet Entry:', background=bg_color, fg=text_color).grid(row=2, column=0, sticky='w')
+    tk.Label(root, text='DELETE', background=bg_color, fg=text_color).grid(row=2, column=1, sticky='w')
+
+    tk.Label(root, text='Exit:', background=bg_color, fg=text_color).grid(row=3, column=0, sticky='w')
+    tk.Label(root, text='ESCAPE', background=bg_color, fg=text_color).grid(row=3, column=1, sticky='w')
+
+    tk.Label(root, text='Save File:', background=bg_color, fg=text_color).grid(row=4, column=0, sticky='w')
+    tk.Label(root, text='Control-s', background=bg_color, fg=text_color).grid(row=4, column=1, sticky='w')
+
+    tk.Label(root, text='Open File:', background=bg_color, fg=text_color).grid(row=5, column=0, sticky='w')
+    tk.Label(root, text='Control-o', background=bg_color, fg=text_color).grid(row=5, column=1, sticky='w')
+
+    tk.Label(root, text='Info:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=6, column=0, sticky='w')
+    text = tk.Text(root, bg=bg_color, fg=text_color, width=30, height=8, font=Font(family="Segoe UI", size=9), relief='flat')
+    text.grid(row=7)
+    text.insert('insert', 'If you have any problems or\nsuggestions for improvement,\nyou are welcome to send me an\nemail. Suggestions for.\nimprovements to the code are\nalso welcome, you can find it on\nGithub.')
+    text.config(state='disabled')
+    tk.Button(root, text='Donate', relief='flat', font=Font(underline=True, size=8),fg='#0082FF', bg=lab_color, activebackground=lab_color, command=(lambda : open_link('https://www.paypal.com/donate/?hosted_button_id=47BGH5AWNSV88'))).grid(row=13, column=0, sticky='w')
+    tk.Button(root, text='Github', relief='flat', font=Font(underline=True, size=8),fg='#0082FF', bg=lab_color, activebackground=lab_color, command=(lambda : open_link('https://github.com/Meith0717/BondMarket.git'))).grid(row=14, column=0, sticky='w')
+    tk.Button(root, text='meith0717@gmail.com', relief='flat',font=Font(underline=True, size=8), fg='#0082FF', bg=lab_color, activebackground=lab_color, command=(lambda : messagebox.showinfo(title='Info',message='Mail-Adress copy to clipboard', options=clipboard.copy('meith0717@gmail.com')))).grid(row=15, column=0, sticky='w')
 
 def tools_ (root : tk.Tk, app : app_lib.app_state):
     global s0, s1, s2, s3, s4, s5, s6, s7, s8, s9
@@ -315,6 +342,7 @@ def entry_ (root : tk.Tk, app : app_lib.app_state):
     ttk.Button(root, text='Clear',width=5, command=(lambda : clear(app))).grid(row=3, column=5, padx=12, pady=2)
 
 def button_ (root : tk.Tk, app : app_lib.app_state):
+
     ttk.Button(root, text='Exit', width=5, command=(lambda : exit(win, app))).pack(side='right', anchor='s', padx=5)
     ttk.Button(root, text='Save', width=5, command=(lambda : save(app))).pack(side='right', anchor='s', padx=5)
     ttk.Button(root, text='Create PDF', command=(lambda : export_txt_file.export(app))).pack(side='right', anchor='s', padx=5, fill='x')
@@ -326,7 +354,7 @@ def window (winx : int, winy : int, restart : bool):
     global bg_color, text_color, lab_color, win, data_frame
 
     # Initializes the main class and loads the data from the files
-    app = app_lib.app_state([], {}, True)
+    app = app_lib.app_state([], {}, False)
     save_data_lib.read_settings_from_file(app)
     save_data_lib.read_data_from_file(app)
     win = ThemedTk()
@@ -366,9 +394,10 @@ def window (winx : int, winy : int, restart : bool):
 
     # Set a few keyboard shortcuts
     win.bind('<Control-s>', lambda event: save(app))
+    win.bind('<Control-o>', lambda event: get_data_path(app))
     win.bind('<Escape>', lambda event: exit(win, app))
     win.bind('<Return>', lambda event: safe_to_dataarray(app))
-    win.bind('<t>', lambda event: debts_lib.get_transfere_str(app))
+    win.bind('<Delete>', lambda event: delet_from_dataarray(app))
 
     # A few functions
     table_(data_frame, app)

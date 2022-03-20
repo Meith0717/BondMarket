@@ -15,12 +15,15 @@ def save_in_pkl (file_path : str, data : list or dict,) -> None:
 
 def read_from_pkl (file_path : str) -> Any:
     try:
+        if os.stat(file_path).st_size == 0:
+            print('File is empty')
+            return False 
         file = open(file_path, "rb")
-        settings_dict : dict = pickle.load(file)
+        data : dict = pickle.load(file)
         file.close()
     except FileNotFoundError:
         return False
-    return settings_dict
+    return data
 
 def save_settings_in_file (app : app_lib.app_state) -> None:
     save_in_pkl(f"{os.path.expanduser('~/Documents/BondMarket')}/config.pkl", app.settings)

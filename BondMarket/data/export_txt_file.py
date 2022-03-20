@@ -2,7 +2,7 @@ from tkinter.filedialog import askdirectory
 from tkinter import messagebox
 from fpdf import FPDF
 from app.app_lib import app_state
-from debts.debts_lib import calc, get_transfere_str
+from calculations.debts_lib import calc, get_transfere_str
 
 def get_dir_path () -> str or bool:
     path : str = askdirectory()
