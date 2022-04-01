@@ -1,4 +1,4 @@
->_*V4.1 Coming Soon*_
+
 ![](https://github.com/Meith0717/BondMarket/blob/main/Images/BondMarket_Logo_white.png)
 ## **Introduction**
 This program is designed to manage your finances within a group or relationship. If you and your partner want to share your finances fairly, this program is for you. It keeps track of your monthly expenses and calculates each person's debt at the end of the month. It supports up to 10 people, so it's great for managing finances within a group.
