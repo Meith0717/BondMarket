@@ -2,7 +2,8 @@ import pickle
 import os
 from datetime import date
 from typing import Any
-from app import app_lib
+from Theme.theme_lib import LIGHT
+import Lib.app_lib as app_lib
 
 def check_if_dir_exist (path : str):
     if os.path.isdir(f"{path}/BondMarket") is False:
@@ -31,7 +32,7 @@ def save_settings_in_file (app : app_lib.app_state) -> None:
 def read_settings_from_file (app : app_lib.app_state) -> None:
     if read_from_pkl(f"{os.path.expanduser('~/Documents/BondMarket')}/config.pkl") == False:
         check_if_dir_exist(os.path.expanduser("~/Documents"))
-        app.settings = app_lib.settings(f"{os.path.expanduser('~/Documents/BondMarket')}/data.pkl", 'white', date.today().strftime("%Y"), date.today().strftime("%m"))
+        app.settings = app_lib.settings(f"{os.path.expanduser('~/Documents/BondMarket')}/data.pkl", LIGHT, date.today().strftime("%Y"), date.today().strftime("%m"))
     else:
         app.settings = read_from_pkl(f"{os.path.expanduser('~/Documents/BondMarket')}/config.pkl")
 

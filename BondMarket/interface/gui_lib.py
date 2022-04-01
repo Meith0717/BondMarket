@@ -1,18 +1,19 @@
 code_autor = "Thierry Meiers"
-code_copyright = "Copyright © 2022 Thierry Meiers"
+code_copyright = "Copyright © 2022 Thierry Meiers" 
 code_version = "4.0"
 
 import tkinter as tk
 import clipboard 
 import webbrowser
-from tkinter import ttk, filedialog
-from ttkthemes import ThemedTk
-from tkinter.font import Font
-from tkinter import messagebox
-from app import app_lib
-from data import save_data_lib, create_backup_file, export_txt_file
+import Lib.app_lib as app_lib
+import Lib.save_backup_lib as save_backup_lib
+import Lib.save_pdf_lib as save_pdf_lib 
+import Calculations.debts_lib as debts_lib
+from Lib.save_data_lib import save_data_in_file, save_settings_in_file, read_data_from_file, read_settings_from_file, read_from_pkl
+from Theme.theme_lib import LIGHT, DARK
 from datetime import date
-from calculations import debts_lib
+from tkinter.font import Font
+from tkinter import messagebox, filedialog
 
 def update_screen(app : app_lib.app_state):
     combo1.config(values=tuple(app_lib.find_names(app)))
@@ -85,9 +86,16 @@ def delet_from_dataarray (app : app_lib.app_state):
     clear(app)
     update_screen(app)
 
+def ask_to_save(app : app_lib):
+    if app.safe_state_data: 
+        pass
+    else:
+        if messagebox.askyesno('Warning!', 'Do you want to save?'):
+            save_data_in_file(app)
+            save_settings_in_file(app)
+
 def exit (root : tk.Tk, app : app_lib.app_state):
-    save_data_lib.save_data_in_file(app)
-    save_data_lib.save_settings_in_file(app)
+    ask_to_save(app)
     root.destroy()
 
 def OnDoubleClick(app: app_lib.app_state, event):
@@ -105,8 +113,8 @@ def OnDoubleClick(app: app_lib.app_state, event):
 
 def save (app : app_lib.app_state):
     app.safe_state_data = True
-    save_data_lib.save_data_in_file(app)
-    save_data_lib.save_settings_in_file(app)
+    save_data_in_file(app)
+    save_settings_in_file(app)
     update_screen(app)
     
 def clear (app : app_lib.app_state):
@@ -119,7 +127,7 @@ def clear (app : app_lib.app_state):
     else:
         e4.insert(0, f"{app.settings.jear}.{app.settings.month}.01")
 
-def get_data_path (app : app_lib.app_state):
+def get_data_path (main_root : tk.Tk, app : app_lib.app_state):
     if app.safe_state_data is False:
         return
     prew_path = app.settings.data_path
@@ -127,10 +135,10 @@ def get_data_path (app : app_lib.app_state):
     if app.settings.data_path == '' or prew_path == app.settings.data_path:
         app.settings.data_path = prew_path
     else:
-        save_data_lib.save_settings_in_file(app)
-        win.destroy()
-        window(700, 550, True)
-
+        save_settings_in_file(app)
+        read_data_from_file(app)
+        update_screen(app)
+        
 def center_window(root : tk.Tk, w=300, h=200):
     # get screen width and height
     ws = root.winfo_screenwidth()
@@ -142,8 +150,8 @@ def center_window(root : tk.Tk, w=300, h=200):
 
 def table_ (root, app : app_lib.app_state):
     global tree
-    tree = ttk.Treeview(root, column=("c1", "c2", "c3", "c4"), show='headings', selectmode='browse', height=200)
-    vsb = ttk.Scrollbar(root, orient='vertical', command=tree.yview)
+    tree = tk.ttk.Treeview(root, column=("c1", "c2", "c3", "c4"), show='headings', selectmode='browse', height=200)
+    vsb = tk.ttk.Scrollbar(root, orient='vertical', command=tree.yview)
     headline : list = ['Person', 'Amount', 'Coment', 'Date']
     tree.tag_configure('odd', background='#F4F6F7')
     tree.tag_configure('even', background='#F0F3F4')
@@ -169,25 +177,26 @@ def table_ (root, app : app_lib.app_state):
     tree.config(yscrollcommand=vsb.set)
     tree.bind("<Double-1>", lambda event: OnDoubleClick(app, event))
 
-def settings_ (root : tk.Tk, app : app_lib.app_state) :
+def settings_ (main_root : tk.Tk, root : tk.Tk, app : app_lib.app_state) :
     global p1, change, backup
 
     def restore_backup(app : app_lib.app_state):
         if messagebox.askyesno('Warning', 'Are you sure you want to recover the data? Data can be lost'):
             path = filedialog.askopenfilename(filetypes=[('PKL', '.pkl')])
             if path != '':
-                app.data_array = save_data_lib.read_from_pkl(path)
+                app.data_array = read_from_pkl(path)
                 update_screen(app)
 
     def save_appearance (app : app_lib.app_state):
-        if app.settings.appearance != sel_apperance.get():
-            app.settings.appearance = sel_apperance.get()
-            save_data_lib.save_settings_in_file(app)
-            save_data_lib.save_data_in_file(app)
-            winx = win.winfo_width()
-            winy = win.winfo_height()
-            win.destroy()
-            window(winx, winy, True)
+        print(str(app.settings.appearance))
+        if sel_apperance.get() in str(app.settings.appearance):
+            return
+        if sel_apperance.get() == 'LIGHT':
+            app.settings.appearance = LIGHT
+        if sel_apperance.get() == 'DARK':
+            app.settings.appearance = DARK
+        save_settings_in_file(app)
+        messagebox.askyesno('Warning!', 'Restart the application for the changes to be effective!')
 
     def save_filter (app : app_lib.app_state):
         if jear.get() == '' or month.get() == '':
@@ -202,216 +211,145 @@ def settings_ (root : tk.Tk, app : app_lib.app_state) :
             app.data_array = []
             update_screen(app)
 
-    tk.Label(root, text='Appearance:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=1, sticky='w', pady=5, padx=1)
+    tk.Label(root, text='Appearance:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).grid(row=1, sticky='w', pady=5, padx=1)
     
     sel_apperance = tk.StringVar()
-    sel_apperance.set(app.settings.appearance)
-    ttk.Radiobutton(root, text='white', value='white', variable=sel_apperance).grid(row=2, sticky='w', pady=5, padx=1)
-    ttk.Radiobutton(root, text='Dark', value='Dark', variable=sel_apperance).grid(row=3, sticky='w', pady=5, padx=1)
+    sel_apperance.set(app.settings.appearance.name)
+    tk.ttk.Radiobutton(root, text='white', value='LIGHT', variable=sel_apperance).grid(row=2, sticky='w', pady=5, padx=1)
+    tk.ttk.Radiobutton(root, text='Dark', value='DARK', variable=sel_apperance).grid(row=3, sticky='w', pady=5, padx=1)
 
-    tk.Label(root, text='Data Table:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=4, sticky='w', pady=5, padx=1)
-    tk.Label(root, text='Month:', fg=text_color, bg=lab_color).grid(row=5, sticky='w', pady=5, padx=1)
-    month = ttk.Combobox(root, values=tuple(x for x in ['all', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11' ,'12']))
+    tk.Label(root, text='Data Table:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).grid(row=4, sticky='w', pady=5, padx=1)
+    tk.Label(root, text='Month:', fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).grid(row=5, sticky='w', pady=5, padx=1)
+    month = tk.ttk.Combobox(root, values=tuple(x for x in ['all', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11' ,'12']))
     month.grid(row=5,column=2,sticky='w', pady=5, padx=1)
     month.insert(0, date.today().strftime("%m"))
-    tk.Label(root, text='Jear:', fg=text_color, bg=lab_color).grid(row=6, sticky='w', pady=5, padx=1)
-    jear = ttk.Combobox(root, values=tuple(x for x in range(2000, 2100)))
+    tk.Label(root, text='Jear:', fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).grid(row=6, sticky='w', pady=5, padx=1)
+    jear = tk.ttk.Combobox(root, values=tuple(x for x in range(2000, 2100)))
     jear.grid(row=6,column=2,sticky='w', pady=5, padx=1)
     jear.insert(0, app.settings.jear)
 
-    tk.Label(root, text='Data Path:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=text_color, bg=lab_color).grid(row=7, sticky='w', pady=5, padx=1)
-    tk.Label(root, text='Save to enable Button', font=Font(family="Segoe UI", size=8), fg=text_color, bg=lab_color).grid(row=8,column=2, sticky='w', pady=5, padx=1)
+    tk.Label(root, text='Data Path:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).grid(row=7, sticky='w', pady=5, padx=1)
+    tk.Label(root, text='Save to enable Button', font=Font(family="Segoe UI", size=8), fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).grid(row=8,column=2, sticky='w', pady=5, padx=1)
 
-    p1 = tk.Label(root, text=f"{app.settings.data_path}", fg=text_color, bg=lab_color)
-    tk.Label(root, text=f"Default: ~/Documents", fg=text_color, bg=lab_color).place(x=1, y=290)
+    p1 = tk.Label(root, text=f"{app.settings.data_path}", fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color)
+    tk.Label(root, text=f"Default: ~/Documents", fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).place(x=1, y=290)
     p1.place(x=1, y=270)
 
-    ttk.Button(root, text='Apply', command=(lambda : save_appearance(app))).grid(row=1, column=10, padx=5, pady=5)
-    ttk.Button(root, text='Clear Data', command=(lambda : clear(app))).grid(row=4, column=10, padx=5, pady=5)
-    ttk.Button(root, text='Apply', command=(lambda : save_filter(app))).grid(row=5, column=10, padx=5, pady=5)
-    ttk.Button(root, text='Restore', command=(lambda : restore_backup(app))).grid(row=8, column=10, padx=5, pady=5)
-    backup = ttk.Button(root, text='Create Backup', command=(lambda : create_backup_file.create_backup(app)))
+    tk.ttk.Button(root, text='Apply', command=(lambda : save_appearance(app))).grid(row=1, column=10, padx=5, pady=5)
+    tk.ttk.Button(root, text='Clear Data', command=(lambda : clear(app))).grid(row=4, column=10, padx=5, pady=5)
+    tk.ttk.Button(root, text='Apply', command=(lambda : save_filter(app))).grid(row=5, column=10, padx=5, pady=5)
+    tk.ttk.Button(root, text='Restore', command=(lambda : restore_backup(app))).grid(row=8, column=10, padx=5, pady=5)
+    backup = tk.ttk.Button(root, text='Create Backup', command=(lambda : save_backup_lib.create_backup(app)))
     backup.grid(row=8, column=0, padx=5, pady=5)
-    change = ttk.Button(root, text='Open File', command=(lambda : get_data_path(app)))
+    change = tk.ttk.Button(root, text='Open File', command=(lambda : get_data_path(main_root, app)))
     change.grid(row=7, column=10, padx=5, pady=5)
     change.config(state='disabled')
     backup.config(state='disabled')
 
-def info_ (root) :
+def info_ (root, app : app_lib) :
    
     def open_link (link : str):
         if messagebox.askokcancel(title='Info',message=f"You will be redirected to {link}, do you want to continue?"):
             webbrowser.open(link, new=0, autoraise=True)
 
-    tk.Label(root, text='Shortcuts:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=0, column=0, sticky='w')
+    tk.Label(root, text='Shortcuts:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=0, column=0, sticky='w')
 
-    tk.Label(root, text='Save Entry:', background=bg_color, fg=text_color).grid(row=1, column=0, sticky='w')
-    tk.Label(root, text='ENTER', background=bg_color, fg=text_color).grid(row=1, column=1, sticky='w')
+    tk.Label(root, text='Save Entry:', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=1, column=0, sticky='w')
+    tk.Label(root, text='ENTER', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=1, column=1, sticky='w')
 
-    tk.Label(root, text='Delet Entry:', background=bg_color, fg=text_color).grid(row=2, column=0, sticky='w')
-    tk.Label(root, text='DELETE', background=bg_color, fg=text_color).grid(row=2, column=1, sticky='w')
+    tk.Label(root, text='Delet Entry:', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=2, column=0, sticky='w')
+    tk.Label(root, text='DELETE', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=2, column=1, sticky='w')
 
-    tk.Label(root, text='Exit:', background=bg_color, fg=text_color).grid(row=3, column=0, sticky='w')
-    tk.Label(root, text='ESCAPE', background=bg_color, fg=text_color).grid(row=3, column=1, sticky='w')
+    tk.Label(root, text='Exit:', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=3, column=0, sticky='w')
+    tk.Label(root, text='ESCAPE', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=3, column=1, sticky='w')
 
-    tk.Label(root, text='Save File:', background=bg_color, fg=text_color).grid(row=4, column=0, sticky='w')
-    tk.Label(root, text='Control-s', background=bg_color, fg=text_color).grid(row=4, column=1, sticky='w')
+    tk.Label(root, text='Save File:', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=4, column=0, sticky='w')
+    tk.Label(root, text='Control-s', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=4, column=1, sticky='w')
 
-    tk.Label(root, text='Open File:', background=bg_color, fg=text_color).grid(row=5, column=0, sticky='w')
-    tk.Label(root, text='Control-o', background=bg_color, fg=text_color).grid(row=5, column=1, sticky='w')
+    tk.Label(root, text='Open File:', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=5, column=0, sticky='w')
+    tk.Label(root, text='Control-o', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=5, column=1, sticky='w')
 
-    tk.Label(root, text='Info:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=6, column=0, sticky='w')
-    text = tk.Text(root, bg=bg_color, fg=text_color, width=30, height=8, font=Font(family="Segoe UI", size=9), relief='flat')
+    tk.Label(root, text='Info:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=6, column=0, sticky='w')
+    text = tk.Text(root, bg=app.settings.appearance.lb_color, fg=app.settings.appearance.fg_color, width=30, height=8, font=Font(family="Segoe UI", size=9), relief='flat')
     text.grid(row=7)
     text.insert('insert', 'If you have any problems or\nsuggestions for improvement,\nyou are welcome to send me an\nemail. Suggestions for.\nimprovements to the code are\nalso welcome, you can find it on\nGithub.')
     text.config(state='disabled')
-    tk.Button(root, text='Donate', relief='flat', font=Font(underline=True, size=8),fg='#0082FF', bg=lab_color, activebackground=lab_color, command=(lambda : open_link('https://www.paypal.com/donate/?hosted_button_id=47BGH5AWNSV88'))).grid(row=13, column=0, sticky='w')
-    tk.Button(root, text='Github', relief='flat', font=Font(underline=True, size=8),fg='#0082FF', bg=lab_color, activebackground=lab_color, command=(lambda : open_link('https://github.com/Meith0717/BondMarket.git'))).grid(row=14, column=0, sticky='w')
-    tk.Button(root, text='meith0717@gmail.com', relief='flat',font=Font(underline=True, size=8), fg='#0082FF', bg=lab_color, activebackground=lab_color, command=(lambda : messagebox.showinfo(title='Info',message='Mail-Adress copy to clipboard', options=clipboard.copy('meith0717@gmail.com')))).grid(row=15, column=0, sticky='w')
+    tk.Button(root, text='Donate', relief='flat', font=Font(underline=True, size=8),fg='#0082FF', bg=app.settings.appearance.lb_color, activebackground=app.settings.appearance.lb_color, command=(lambda : open_link('https://www.paypal.com/donate/?hosted_button_id=47BGH5AWNSV88'))).grid(row=13, column=0, sticky='w')
+    tk.Button(root, text='Github', relief='flat', font=Font(underline=True, size=8),fg='#0082FF', bg=app.settings.appearance.lb_color, activebackground=app.settings.appearance.lb_color, command=(lambda : open_link('https://github.com/Meith0717/BondMarket.git'))).grid(row=14, column=0, sticky='w')
+    tk.Button(root, text='meith0717@gmail.com', relief='flat',font=Font(underline=True, size=8), fg='#0082FF', bg=app.settings.appearance.lb_color, activebackground=app.settings.appearance.lb_color, command=(lambda : messagebox.showinfo(title='Info',message='Mail-Adress copy to clipboard', options=clipboard.copy('meith0717@gmail.com')))).grid(row=15, column=0, sticky='w')
 
 def tools_ (root : tk.Tk, app : app_lib.app_state):
     global s0, s1, s2, s3, s4, s5, s6, s7, s8, s9
     global d0, d1, d2, d3, d4, d5, d6, d7, d8, d9
     l : list = debts_lib.calc_expand(app)
     s : list = debts_lib.get_transfere_str(app)
-    s0 = tk.Label(root, text= f"{l[0].name}{l[0].amount}" , bg=bg_color, fg=text_color)
+    s0 = tk.Label(root, text= f"{l[0].name}{l[0].amount}" , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     s0.grid(row=1, column=0, sticky='w', pady=0, padx=30)
-    s1 = tk.Label(root, text= f"{l[1].name}{l[1].amount}" , bg=bg_color, fg=text_color)
+    s1 = tk.Label(root, text= f"{l[1].name}{l[1].amount}" , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     s1.grid(row=2, column=0, sticky='w', pady=0, padx=30)
-    s2 = tk.Label(root, text= f"{l[2].name}{l[2].amount}" , bg=bg_color, fg=text_color)
+    s2 = tk.Label(root, text= f"{l[2].name}{l[2].amount}" , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     s2.grid(row=3, column=0, sticky='w', pady=0, padx=30)
-    s3 = tk.Label(root, text= f"{l[3].name}{l[3].amount}" , bg=bg_color, fg=text_color)
+    s3 = tk.Label(root, text= f"{l[3].name}{l[3].amount}" , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     s3.grid(row=4, column=0, sticky='w', pady=0, padx=30)
-    s4 = tk.Label(root, text= f"{l[4].name}{l[4].amount}" , bg=bg_color, fg=text_color)
+    s4 = tk.Label(root, text= f"{l[4].name}{l[4].amount}" , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     s4.grid(row=5, column=0, sticky='w', pady=0, padx=30)
-    s5 = tk.Label(root, text= f"{l[5].name}{l[5].amount}" , bg=bg_color, fg=text_color)
+    s5 = tk.Label(root, text= f"{l[5].name}{l[5].amount}" , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     s5.grid(row=6, column=0, sticky='w', pady=0, padx=30)
-    s6 = tk.Label(root, text= f"{l[6].name}{l[6].amount}" , bg=bg_color, fg=text_color)
+    s6 = tk.Label(root, text= f"{l[6].name}{l[6].amount}" , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     s6.grid(row=7, column=0, sticky='w', pady=0, padx=30)
-    s7 = tk.Label(root, text= f"{l[7].name}{l[7].amount}" , bg=bg_color, fg=text_color)
+    s7 = tk.Label(root, text= f"{l[7].name}{l[7].amount}" , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     s7.grid(row=8, column=0, sticky='w', pady=0, padx=30)
-    s8 = tk.Label(root, text= f"{l[8].name}{l[8].amount}" , bg=bg_color, fg=text_color)
+    s8 = tk.Label(root, text= f"{l[8].name}{l[8].amount}" , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     s8.grid(row=9, column=0, sticky='w', pady=0, padx=30)
-    s9 = tk.Label(root, text= f"{l[9].name}{l[9].amount}" , bg=bg_color, fg=text_color)
+    s9 = tk.Label(root, text= f"{l[9].name}{l[9].amount}" , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     s9.grid(row=10, column=0, sticky='w', pady=0, padx=30)
-    d0 = tk.Label(root, text=s[0], bg=bg_color, fg=text_color)
+    d0 = tk.Label(root, text=s[0], bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     d0.grid(row=12, column=0, sticky='w', pady=0, padx=30)
-    d1 = tk.Label(root, text=s[1], bg=bg_color, fg=text_color)
+    d1 = tk.Label(root, text=s[1], bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     d1.grid(row=13, column=0, sticky='w', pady=0, padx=30)
-    d2 = tk.Label(root, text=s[2] , bg=bg_color, fg=text_color)
+    d2 = tk.Label(root, text=s[2] , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     d2.grid(row=14, column=0, sticky='w', pady=0, padx=30)
-    d3 = tk.Label(root, text=s[3] , bg=bg_color, fg=text_color)
+    d3 = tk.Label(root, text=s[3] , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     d3.grid(row=15, column=0, sticky='w', pady=0, padx=30)
-    d4 = tk.Label(root, text=s[4], bg=bg_color, fg=text_color)
+    d4 = tk.Label(root, text=s[4], bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     d4.grid(row=16, column=0, sticky='w', pady=0, padx=30)
-    d5 = tk.Label(root, text=s[5] , bg=bg_color, fg=text_color)
+    d5 = tk.Label(root, text=s[5] , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     d5.grid(row=17, column=0, sticky='w', pady=0, padx=30)
-    d6 = tk.Label(root, text=s[6] , bg=bg_color, fg=text_color)
+    d6 = tk.Label(root, text=s[6] , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     d6.grid(row=18, column=0, sticky='w', pady=0, padx=30)
-    d7 = tk.Label(root, text=s[7] , bg=bg_color, fg=text_color)
+    d7 = tk.Label(root, text=s[7] , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     d7.grid(row=19, column=0, sticky='w', pady=0, padx=30)
-    d8 = tk.Label(root, text=s[8] , bg=bg_color, fg=text_color)
+    d8 = tk.Label(root, text=s[8] , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     d8.grid(row=20, column=0, sticky='w', pady=0, padx=30)
-    d9 = tk.Label(root, text=s[9] , bg=bg_color, fg=text_color)
+    d9 = tk.Label(root, text=s[9] , bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color)
     d9.grid(row=11, column=0, sticky='w', pady=0, padx=30)
-    tk.Label(root, text='Total expenses:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=0, column=0, sticky='w', pady=1, padx=2)
-    tk.Label(root, text='Total debt:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=bg_color, fg=text_color).grid(row=11, column=0, sticky='w', pady=1, padx=2)
+    tk.Label(root, text='Total expenses:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=0, column=0, sticky='w', pady=1, padx=2)
+    tk.Label(root, text='Total debt:', font=Font(family="Segoe UI", size=12, weight='bold'), bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=11, column=0, sticky='w', pady=1, padx=2)
 
 def entry_ (root : tk.Tk, app : app_lib.app_state):
     # cavas ##############################################################################################
     fields : list = ['Person:', 'Amount:', 'Coment:', 'Date:']
     for i, field in enumerate(fields):
-        tk.Label(root, width=8, text=field, anchor='w', font=Font(family="Segoe UI", size=10), fg=text_color, bg=bg_color).grid(row=i, padx=2, pady=2,  sticky='e')
+        tk.Label(root, width=8, text=field, anchor='w', font=Font(family="Segoe UI", size=10), fg=app.settings.appearance.fg_color, bg=app.settings.appearance.bg_color).grid(row=i, padx=2, pady=2,  sticky='e')
     global combo1, e2, e3, e4
     app_lib.find_names(app)
-    combo1 = ttk.Combobox(root, values=tuple(app_lib.find_names(app)), height=17, width=32)
+    combo1 = tk.ttk.Combobox(root, values=tuple(app_lib.find_names(app)), height=17, width=32)
     combo1.grid(row=0, column=1, padx=2, pady=2, sticky='e')
-    e2 = ttk.Entry(root, font=Font(family="Segoe UI", size=10), width=30)
+    e2 = tk.ttk.Entry(root, font=Font(family="Segoe UI", size=10), width=30)
     e2.grid(row=1, column=1, padx=2, pady=2, sticky='e')
-    e3 = ttk.Entry(root, font=Font(family="Segoe UI", size=10), width=30)
+    e3 = tk.ttk.Entry(root, font=Font(family="Segoe UI", size=10), width=30)
     e3.grid(row=2, column=1, padx=2, pady=2, sticky='e')
-    e4 = ttk.Entry(root, font=Font(family="Segoe UI", size=10), width=30)
+    e4 = tk.ttk.Entry(root, font=Font(family="Segoe UI", size=10), width=30)
     e4.grid(row=3, column=1, padx=2, pady=2, sticky='e')
     if app.settings.month == 'all' or app.settings.month == date.today().strftime("%m"):
         e4.insert(0, date.today().strftime("%Y.%m.%d"))
     else:
         e4.insert(0, f"{app.settings.jear}.{app.settings.month}.01")
     # Buttons ##############################################################################################
-    ttk.Button(root, text='Add',width=5,command=(lambda : safe_to_dataarray(app))).grid(row=1, column=5, padx=12, pady=2)
-    ttk.Button(root, text='Delet',width=5, command=(lambda : delet_from_dataarray(app))).grid(row=2, column=5, padx=12, pady=2)
-    ttk.Button(root, text='Clear',width=5, command=(lambda : clear(app))).grid(row=3, column=5, padx=12, pady=2)
+    tk.ttk.Button(root, text='Add',width=5,command=(lambda : safe_to_dataarray(app))).grid(row=1, column=5, padx=12, pady=2)
+    tk.ttk.Button(root, text='Delet',width=5, command=(lambda : delet_from_dataarray(app))).grid(row=2, column=5, padx=12, pady=2)
+    tk.ttk.Button(root, text='Clear',width=5, command=(lambda : clear(app))).grid(row=3, column=5, padx=12, pady=2)
 
 def button_ (root : tk.Tk, app : app_lib.app_state):
-
-    ttk.Button(root, text='Exit', width=5, command=(lambda : exit(win, app))).pack(side='right', anchor='s', padx=5)
-    ttk.Button(root, text='Save', width=5, command=(lambda : save(app))).pack(side='right', anchor='s', padx=5)
-    ttk.Button(root, text='Create PDF', command=(lambda : export_txt_file.export(app))).pack(side='right', anchor='s', padx=5, fill='x')
-    tk.Label(root, text='Please use exit button, otherwise data loss may occur', bg=bg_color, fg='red').pack(side='left', padx=50)
-
-def window (winx : int, winy : int, restart : bool):
-    '''This is the main function that creates the window.'''
-
-    global bg_color, text_color, lab_color, win, data_frame
-
-    # Initializes the main class and loads the data from the files
-    app = app_lib.app_state([], {}, False)
-    save_data_lib.read_settings_from_file(app)
-    save_data_lib.read_data_from_file(app)
-    win = ThemedTk()
-
-    # Checks the setting whether the appearance is set to Dark or Light
-    if app.settings.appearance == 'white':
-        bg_color = None
-        text_color = 'black'
-        lab_color = '#f0f0f0'
-    elif app.settings.appearance == 'Dark':
-        win.config(theme='black')
-        bg_color = '#424242'
-        text_color = 'white'
-        lab_color = '#424242'
-    
-    # Set some window settings 
-    win.title('')
-    win.wm_attributes('-toolwindow', 'True')
-    win.config(bg=bg_color)
-    win.geometry(f'{winx}x{winy}')
-    win.minsize(700, 550)
-    center_window(win, winx, winy)
-
-    # Define some frames and set preferences
-    data_frame = tk.Frame(win, bg=bg_color, relief='flat')
-    entry_frame = tk.Frame(win, bg=bg_color, relief='flat')
-    more_frame = tk.Frame(win, bg=bg_color, relief='flat')
-    button_frame = tk.Frame(win, bg=bg_color, relief='flat')
-    tabs = ttk.Notebook(more_frame)
-    tab1 = ttk.Frame(tabs, relief='flat')
-    tab2 = ttk.Frame(tabs, relief='flat') 
-    tab3 = ttk.Frame(tabs, relief='flat') 
-    tabs.add(tab1, text ='     Tools     ')
-    tabs.add(tab2, text ='    Settings   ')
-    tabs.add(tab3, text ='   Help/Info   ')
-    tabs.pack(side='left', fill='both', padx=5, pady=5)
-
-    # Set a few keyboard shortcuts
-    win.bind('<Control-s>', lambda event: save(app))
-    win.bind('<Control-o>', lambda event: get_data_path(app))
-    win.bind('<Escape>', lambda event: exit(win, app))
-    win.bind('<Return>', lambda event: safe_to_dataarray(app))
-    win.bind('<Delete>', lambda event: delet_from_dataarray(app))
-
-    # A few functions
-    table_(data_frame, app)
-    entry_(entry_frame, app)
-    tools_(tab1, app)
-    settings_(tab2, app)
-    info_(tab3)
-    button_(button_frame, app)
-
-    # Place some Frames 
-    tk.Label(win, text='Python 3.10.1     %s    Version %s' %(code_copyright,code_version), font=Font(family="Segoe UI", size=8), fg=text_color, bg=bg_color, width=5000).pack(side='bottom', fill='x')
-    button_frame.pack(side='bottom', anchor='se', fill='x')
-    more_frame.pack(side='right', padx=2, pady=2, fill='y')
-    tk.Label(win, text='BondMarket', font=Font(family="Segoe UI", size=17), fg=text_color, bg=bg_color).pack(side='top', anchor='sw', padx=2, pady=2)
-    entry_frame.pack(side='bottom', anchor='w', padx=2, pady=2, fill='both')
-    data_frame.pack(side='top', anchor='nw', padx=2, pady=2, fill='both')
-    win.mainloop()
+    tk.ttk.Button(root, text='Save', width=5, command=(lambda : save(app))).pack(side='right', anchor='s', padx=5)
+    tk.ttk.Button(root, text='Create PDF', command=(lambda : save_pdf_lib.export(app))).pack(side='right', anchor='s', padx=5, fill='x')

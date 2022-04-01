@@ -8,9 +8,17 @@ class data:
     date        : str
 
 @dataclass
+class theme:
+    name        : str
+    bg_color    : str
+    fg_color    : str
+    lb_color    : str
+    ttk_theme   : str
+
+@dataclass
 class settings:
     data_path       : str
-    appearance      : str
+    appearance      : theme
     jear            : int
     month           : int
 

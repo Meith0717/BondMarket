@@ -1,8 +1,8 @@
-from data import save_data_lib
+import Lib.save_data_lib as save_data_lib 
+import Lib.app_lib as app_lib
 import os
 from tkinter import messagebox
 from datetime import datetime
-from app import app_lib
 
 def create_backup (app : app_lib.app_state):
     path = os.path.expanduser('~\Documents\BondMarket')
