@@ -232,9 +232,9 @@ def settings_ (main_root : tk.Tk, root : tk.Tk, app : app_lib.app_state) :
     tk.Label(root, text='Data Path:', font=Font(family="Segoe UI", size=12, weight='bold'), fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).grid(row=7, sticky='w', pady=5, padx=1)
     tk.Label(root, text='Save to enable Button', font=Font(family="Segoe UI", size=8), fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).grid(row=8,column=2, sticky='w', pady=5, padx=1)
 
-    p1 = tk.Label(root, text=f"{app.settings.data_path}", fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color)
-    tk.Label(root, text=f"Default: ~/Documents", fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).place(x=1, y=290)
-    p1.place(x=1, y=270)
+    p1 = tk.Label(root, text=app.settings.data_path.replace('/', "\\"), fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color)
+    tk.Label(root, text=f"Default: ~\Documents", fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).place(x=1, y=300)
+    p1.place(x=1, y=275)
 
     tk.ttk.Button(root, text='Apply', command=(lambda : save_appearance(app))).grid(row=1, column=10, padx=5, pady=5)
     tk.ttk.Button(root, text='Clear Data', command=(lambda : clear(app))).grid(row=4, column=10, padx=5, pady=5)
@@ -258,7 +258,7 @@ def info_ (root, app : app_lib) :
     tk.Label(root, text='Save Entry:', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=1, column=0, sticky='w')
     tk.Label(root, text='ENTER', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=1, column=1, sticky='w')
 
-    tk.Label(root, text='Delet Entry:', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=2, column=0, sticky='w')
+    tk.Label(root, text='Deleete Entry:', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=2, column=0, sticky='w')
     tk.Label(root, text='DELETE', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=2, column=1, sticky='w')
 
     tk.Label(root, text='Exit:', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=3, column=0, sticky='w')
@@ -277,7 +277,8 @@ def info_ (root, app : app_lib) :
     text.config(state='disabled')
     tk.Button(root, text='Donate', relief='flat', font=Font(underline=True, size=8),fg='#0082FF', bg=app.settings.appearance.lb_color, activebackground=app.settings.appearance.lb_color, command=(lambda : open_link('https://www.paypal.com/donate/?hosted_button_id=47BGH5AWNSV88'))).grid(row=13, column=0, sticky='w')
     tk.Button(root, text='Github', relief='flat', font=Font(underline=True, size=8),fg='#0082FF', bg=app.settings.appearance.lb_color, activebackground=app.settings.appearance.lb_color, command=(lambda : open_link('https://github.com/Meith0717/BondMarket.git'))).grid(row=14, column=0, sticky='w')
-    tk.Button(root, text='meith0717@gmail.com', relief='flat',font=Font(underline=True, size=8), fg='#0082FF', bg=app.settings.appearance.lb_color, activebackground=app.settings.appearance.lb_color, command=(lambda : messagebox.showinfo(title='Info',message='Mail-Adress copy to clipboard', options=clipboard.copy('meith0717@gmail.com')))).grid(row=15, column=0, sticky='w')
+    tk.Button(root, text='Discord', relief='flat', font=Font(underline=True, size=8),fg='#0082FF', bg=app.settings.appearance.lb_color, activebackground=app.settings.appearance.lb_color, command=(lambda : open_link('https://discordapp.com/users/773830054726860811/'))).grid(row=15, column=0, sticky='w')
+    #tk.Button(root, text='meith0717@gmail.com', relief='flat',font=Font(underline=True, size=8), fg='#0082FF', bg=app.settings.appearance.lb_color, activebackground=app.settings.appearance.lb_color, command=(lambda : messagebox.showinfo(title='Info',message='Mail-Adress copy to clipboard', options=clipboard.copy('meith0717@gmail.com')))).grid(row=15, column=0, sticky='w')
 
 def tools_ (root : tk.Tk, app : app_lib.app_state):
     global s0, s1, s2, s3, s4, s5, s6, s7, s8, s9
@@ -347,10 +348,10 @@ def entry_ (root : tk.Tk, app : app_lib.app_state):
     else:
         e4.insert(0, f"{app.settings.jear}.{app.settings.month}.01")
     # Buttons ##############################################################################################
-    tk.ttk.Button(root, text='Add',width=5,command=(lambda : safe_to_dataarray(app))).grid(row=1, column=5, padx=12, pady=2)
-    tk.ttk.Button(root, text='Delet',width=5, command=(lambda : delet_from_dataarray(app))).grid(row=2, column=5, padx=12, pady=2)
-    tk.ttk.Button(root, text='Clear',width=5, command=(lambda : clear(app))).grid(row=3, column=5, padx=12, pady=2)
+    tk.ttk.Button(root, text='Add',width=7,command=(lambda : safe_to_dataarray(app))).grid(row=1, column=5, padx=12, pady=2)
+    tk.ttk.Button(root, text='Delete',width=7, command=(lambda : delet_from_dataarray(app))).grid(row=2, column=5, padx=12, pady=2)
+    tk.ttk.Button(root, text='Clear',width=7, command=(lambda : clear(app))).grid(row=3, column=5, padx=12, pady=2)
 
 def button_ (root : tk.Tk, app : app_lib.app_state):
-    tk.ttk.Button(root, text='Save', width=5, command=(lambda : save(app))).pack(side='right', anchor='s', padx=5)
-    tk.ttk.Button(root, text='Create PDF', command=(lambda : save_pdf_lib.export(app))).pack(side='right', anchor='s', padx=5, fill='x')
+    tk.ttk.Button(root, text='Save', width=5, command=(lambda : save(app))).pack(side='right', anchor='s', padx=10)
+    tk.ttk.Button(root, text='Create PDF', command=(lambda : save_pdf_lib.export(app))).pack(side='right', anchor='s', fill='x')

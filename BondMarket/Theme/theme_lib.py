@@ -5,7 +5,7 @@ LIGHT = theme(
         bg_color=None, 
         fg_color='black', 
         lb_color='#f0f0f0', 
-        ttk_theme='winnative'
+        ttk_theme='xpnative'
         )
 
 DARK = theme(
