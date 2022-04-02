@@ -92,7 +92,7 @@ def ask_to_save(app : app_lib):
     else:
         if messagebox.askyesno('Warning!', 'Do you want to save?'):
             save_data_in_file(app)
-            save_settings_in_file(app)
+    save_settings_in_file(app)
 
 def exit (root : tk.Tk, app : app_lib.app_state):
     ask_to_save(app)
@@ -196,7 +196,8 @@ def settings_ (main_root : tk.Tk, root : tk.Tk, app : app_lib.app_state) :
         if sel_apperance.get() == 'DARK':
             app.settings.appearance = DARK
         save_settings_in_file(app)
-        messagebox.askyesno('Warning!', 'Restart the application for the changes to be effective!')
+        if messagebox.askyesno('Warning!', 'Do you want to restart the application for the changes to take effect!'):
+            exit(main_root, app)
 
     def save_filter (app : app_lib.app_state):
         if jear.get() == '' or month.get() == '':

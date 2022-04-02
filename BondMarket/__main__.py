@@ -3,7 +3,7 @@ __copyright__ = "Copyright © 2022 Thierry Meiers"
 __license__ = "Apache License 2.0"
 __version__ = "4.0"
 
-from ttkthemes import ThemedTk
+from ttkthemes import ThemedStyle
 import tkinter as tk
 from tkinter import ttk
 import Lib.app_lib as app_lib
@@ -17,10 +17,12 @@ def main():
     read_settings_from_file(app)
     read_data_from_file(app)
     print(f'\n{app}')
-    win = ThemedTk(theme=app.settings.appearance.ttk_theme)
+    win = tk.Tk() #theme=app.settings.appearance.ttk_theme
     # Set some window settings 
+    style = ThemedStyle(win)
+    style.theme_use(app.settings.appearance.ttk_theme)
     win.title('')
-    win.iconbitmap('BondMarket\Icons\Transparent.ico')
+    win.iconbitmap('BondMarket\Icons\BondMarket_Icon.ico')
     win.protocol('WM_DELETE_WINDOW', (lambda : exit(win, app)))
     win.config(bg=app.settings.appearance.bg_color)
     win.geometry(f'{1000}x{650}')
