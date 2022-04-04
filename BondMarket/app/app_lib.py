@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from app.theme_lib import theme
 
 @dataclass
 class data:
@@ -8,19 +9,12 @@ class data:
     date        : str
 
 @dataclass
-class theme:
-    name        : str
-    bg_color    : str
-    fg_color    : str
-    lb_color    : str
-    ttk_theme   : str
-
-@dataclass
 class settings:
     data_path       : str
     appearance      : theme
     jear            : int
     month           : int
+    first_start     : int
 
 @dataclass
 class app_state:

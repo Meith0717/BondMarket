@@ -1,9 +1,10 @@
+from msilib.schema import Error
 import pickle
 import os
 from datetime import date
 from typing import Any
-from Theme.theme_lib import LIGHT
-import Lib.app_lib as app_lib
+from app.theme_lib import LIGHT
+import app.app_lib as app_lib
 
 def check_if_dir_exist (path : str):
     if os.path.isdir(f"{path}/BondMarket") is False:
@@ -24,22 +25,30 @@ def read_from_pkl (file_path : str) -> Any:
         file.close()
     except FileNotFoundError:
         return False
+    except ModuleNotFoundError:
+        return 'Error'
+    except AttributeError:
+        return 'Error'
     return data
 
 def save_settings_in_file (app : app_lib.app_state) -> None:
-    save_in_pkl(f"{os.path.expanduser('~/Documents/BondMarket')}/config.pkl", app.settings)
+    save_in_pkl(f"{os.path.expanduser('~/Documents/BondMarket')}/config_V4.1.pkl", app.settings)
 
 def read_settings_from_file (app : app_lib.app_state) -> None:
-    if read_from_pkl(f"{os.path.expanduser('~/Documents/BondMarket')}/config.pkl") == False:
+    if read_from_pkl(f"{os.path.expanduser('~/Documents/BondMarket')}/config_V4.1.pkl")  == 'Error':
+        return 'Error'
+    if read_from_pkl(f"{os.path.expanduser('~/Documents/BondMarket')}/config_V4.1.pkl") == False:
         check_if_dir_exist(os.path.expanduser("~/Documents"))
-        app.settings = app_lib.settings(f"{os.path.expanduser('~/Documents/BondMarket')}/data.pkl", LIGHT, date.today().strftime("%Y"), date.today().strftime("%m"))
+        app.settings = app_lib.settings(f"{os.path.expanduser('~/Documents/BondMarket')}/data.pkl".replace('/', '\\'), LIGHT, date.today().strftime("%Y"), date.today().strftime("%m"), True)
     else:
-        app.settings = read_from_pkl(f"{os.path.expanduser('~/Documents/BondMarket')}/config.pkl")
+        app.settings = read_from_pkl(f"{os.path.expanduser('~/Documents/BondMarket')}/config_V4.1.pkl")
 
 def save_data_in_file (app : app_lib.app_state) -> None:
     save_in_pkl(app.settings.data_path, app.data_array)
 
 def read_data_from_file (app : app_lib.app_state) -> None:
+    if read_from_pkl(app.settings.data_path) == 'Error':
+        return 'Error'
     if read_from_pkl(app.settings.data_path) == False:
         app.data_array = []
     else:

@@ -1,11 +1,12 @@
 from typing import Any
-import Lib.app_lib as app_lib
+import app.app_lib as app_lib
 from dataclasses import dataclass
 
 @dataclass
 class debts:
     name        : str
-    amount      : float  
+    amount      : float
+    difference  : float  
     transfer    : float
 
 def expand (n : int, l : list, fill : Any):
@@ -35,16 +36,23 @@ def get_debts_matrix (app : app_lib.app_state):
     d : dict = get_sort_dict(app)
     l : list = []
     for key, value in d:
-        l += [debts(key + ' :  ', round(value, 2), 0)]
+        l += [debts(key + ' :  ', round(value, 2), 0, 0)]
     return l
 
-def get_average (app : app_lib.app_state):
+def get_total (app : app_lib.app_state):
     d       : dict = get_sort_dict(app)
     total   : float= 0
     if len(d) == 0:
-        return 1
+        return 'n.a.'
     for  key, amount in d:
         total += amount
+    return round(total, 2)
+
+def get_average (app : app_lib.app_state):
+    d       : dict = get_sort_dict(app)
+    total   = get_total(app)
+    if len(d) == 0:
+        return 'n.a.'
     return round(total/len(d), 2)
 
 def calc (app : app_lib.app_state) -> list:
@@ -52,6 +60,7 @@ def calc (app : app_lib.app_state) -> list:
     average : float = get_average(app)
     for i in range(len(l)):
         d1 : debts = l[i]
+        d1.difference = round(average - d1.amount, 2)
         if i == 0:
             d1.transfer = round(average - d1.amount, 2)
         else:
@@ -68,7 +77,7 @@ def get_transfere_str (app : app_lib.app_state):
             for i in range(1, len(l)-1):
                 d0 : debts = l[i]
                 d1 : debts = l[i+1]
-                s += [f"{d0.name[:-4]} --> {d0.transfer} --> {d1.name[:-4]}"]
+                s += [f"{d0.name[:-4]} -> {d0.transfer} -> {d1.name[:-4]}"]
         
         return expand(10, s, '')
     s = ['More than 1 person must be stored']
@@ -77,5 +86,5 @@ def get_transfere_str (app : app_lib.app_state):
 def calc_expand (app : app_lib.app_state):
     l : list = calc(app)
     if len(l) == 0:
-        l = [debts('No Data', '', '')]
-    return expand(10, l, debts('', '', ''))
+        l = [debts('n.a.', '', '', '')]
+    return expand(10, l, debts('', '', '', ''))

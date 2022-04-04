@@ -1,4 +1,12 @@
-from Lib.app_lib import theme
+from dataclasses  import dataclass
+
+@dataclass
+class theme:
+    name        : str
+    bg_color    : str
+    fg_color    : str
+    lb_color    : str
+    ttk_theme   : str
 
 LIGHT = theme(
         name='LIGHT', 
