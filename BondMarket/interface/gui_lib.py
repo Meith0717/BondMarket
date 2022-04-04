@@ -133,8 +133,7 @@ def clear (app : app_lib.app_state):
         e4.insert(0, f"{app.settings.jear}.{app.settings.month}.01")
 
 def open_file (app : app_lib.app_state):
-    if app.safe_state_data is False:
-        return
+    ask_to_save(app)
     prew_path = app.settings.data_path
     app.settings.data_path = filedialog.askopenfilename(filetypes=[('PKL', '.pkl')]).replace('/', '\\')
     if app.settings.data_path == '' or prew_path == app.settings.data_path:
@@ -145,16 +144,19 @@ def open_file (app : app_lib.app_state):
             app.settings.data_path = prew_path
         else:
             save_settings_in_file(app)
+        app.safe_state_data = True
     update_screen(app)
 
 def open_new_file (app : app_lib.app_state):
-    if app.safe_state_data is False:
-        return
+    ask_to_save(app)
+    ask_to_save(app)
     prew_path = app.settings.data_path
     app.settings.data_path = filedialog.asksaveasfilename(filetypes=[('PKL', '.pkl')]).replace('/', '\\')
     if app.settings.data_path == '' or prew_path == app.settings.data_path:
         app.settings.data_path = prew_path
     else:
+        app.safe_state_data = True
+        app.data_array = []
         save_settings_in_file(app)
         save_data_in_file(app)
         update_screen(app)
@@ -238,7 +240,7 @@ def settings_ (main_root : tk.Tk, root : tk.Tk, app : app_lib.app_state, resrart
     tk.Label(root, text='Month:', fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).grid(row=6, sticky='w', pady=5, padx=1)
     month = tk.ttk.Combobox(root, values=tuple(x for x in ['all', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11' ,'12']))
     month.grid(row=6,column=1,sticky='w', pady=5, padx=1)
-    month.insert(0, date.today().strftime("%m"))
+    month.insert(0, app.settings.month)
     tk.Label(root, text='Jear:', fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).grid(row=7, sticky='w', pady=5, padx=1)
     jear = tk.ttk.Combobox(root, values=tuple(x for x in range(2000, 2100)))
     jear.grid(row=7,column=1,sticky='w', pady=5, padx=1)
@@ -247,7 +249,7 @@ def settings_ (main_root : tk.Tk, root : tk.Tk, app : app_lib.app_state, resrart
     tk.ttk.Button(root, text='Clear Table', command=(lambda : clear(app))).grid(row=8, column=1, padx=5, pady=5)
     # Path Settings ##########
     tk.Label(root, text='Data File Path:', font=tkinter.font.Font(family="Segoe UI", size=12, weight='bold'), fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color).grid(row=9, sticky='w', pady=5, padx=1)
-    data_path = tk.Label(root, text='Path:  ' + app.settings.data_path.replace('/', '\\'), fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color, width=45, anchor='w')
+    data_path = tk.Label(root, text=app.settings.data_path.replace('/', '\\'), fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color, width=45, anchor='w')
     data_path.grid(row=12, columnspan=2, sticky='w')
     tk.Label(root, text=f"Default: ~\Documents\BondMarket", fg=app.settings.appearance.fg_color, bg=app.settings.appearance.lb_color, width=45, anchor='w').grid(row=13, columnspan=2, sticky='w')
 
@@ -270,7 +272,6 @@ def info_ (root, app : app_lib) :
     tk.Label(root, text='Control-o', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=5, column=1, sticky='w', padx=10)
     tk.Label(root, text='New File', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=6, column=0, sticky='w')
     tk.Label(root, text='Control-n', background=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=6, column=1, sticky='w', padx=10)
-
 
     tk.Label(root, text='Info:', font=tkinter.font.Font(family="Segoe UI", size=12, weight='bold'), bg=app.settings.appearance.bg_color, fg=app.settings.appearance.fg_color).grid(row=10, column=0, sticky='w')
     tk.Button(root, text='Github', relief='flat', font=tkinter.font.Font(underline=True, size=8),fg='#0082FF', bg=app.settings.appearance.lb_color, activebackground=app.settings.appearance.lb_color, command=(lambda : open_link('https://github.com/Meith0717/BondMarket.git'))).grid(row=11, column=0, sticky='w')

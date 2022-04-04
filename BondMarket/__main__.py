@@ -87,7 +87,7 @@ def main():
         try:
             logo = Image.open("Icons\BondMarket_Logo_white.png")
         except:
-            logo = Image.open("BondMarket\Icons\BondMarket_Logo_whitw.png")
+            logo = Image.open("BondMarket\Icons\BondMarket_Logo_white.png")
     logo = logo.resize((256, 50))
     logo = ImageTk.PhotoImage(logo)
     # Place some Frames 
