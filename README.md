@@ -15,4 +15,4 @@ Download the Installer.exe program and follow the steps. After installing, open 
 2. Here you can create new entries or delete them. Enter your data and press **Add** to add them. To delete an entry, select it by double clicking on it in the table and finally press **Delete**.
 3. This area displays the calculation tools and settings.
 
-![](https://github.com/Meith0717/BondMarket/blob/main/Images/BM_2.png | x200) ![](https://github.com/Meith0717/BondMarket/blob/main/Images/BM_3.png) ![](https://github.com/Meith0717/BondMarket/blob/main/Images/BM_4.png)
+![](https://github.com/Meith0717/BondMarket/blob/main/Images/BM_2.png =x200) ![](https://github.com/Meith0717/BondMarket/blob/main/Images/BM_3.png) ![](https://github.com/Meith0717/BondMarket/blob/main/Images/BM_4.png)
