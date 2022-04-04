@@ -15,7 +15,7 @@ monthly expenses and calculates each person's debt at the end of
 the month. It supports up to 10 people, so it's great for 
 managing finances within a group.
 ## **First steps**
-Download the Installer.exe program and follow the steps. After 
+Download the latest release [Installer.exe](https://github.com/Meith0717/BondMarket/releases/) program and follow the steps. After 
 installing, open BondMarket. Now the UI appears. This is divided 
 into three parts: 
 ![V4.1](https://github.com/Meith0717/BondMarket/blob/main/Images/BM_1.png)
