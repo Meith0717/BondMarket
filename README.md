@@ -1,4 +1,4 @@
-![](Images\BondMarket_Logo_white.png)
+![](https://github.com/Meith0717/BondMarket/blob/main/Images/BondMarket_Logo_white.png)
 
 >**V4.1 Coming Soon**
 > - Spelling Correnctures
@@ -18,7 +18,7 @@ managing finances within a group.
 Download the Installer.exe program and follow the steps. After 
 installing, open BondMarket. Now the UI appears. This is divided 
 into three parts: 
-![V4.1](Images\BM_1.png)
+![V4.1](https://github.com/Meith0717/BondMarket/blob/main/Images/BM_1.png)
 1. This is the table where you can see your saved entries. These 
 are sorted by date.
 2. Here you can create new entries or delete them. Enter your 
