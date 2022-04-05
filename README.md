@@ -33,3 +33,9 @@ adding new data.
 share a new ***.pkl** file via **File -> New File** in a folder 
 within a cloud service of your choice. To open this shared file, 
 simply click on **File -> Open File** and open the desired file.
+# Author
+:bust_in_silhouette:  Thierry Meiers
+- Discord: [@meith0717#8799](https://discordapp.com/users/773830054726860811/)
+# Show your support
+Give a :star: if you like this project. 
+Don't hesitate to contact me for any problem. Suggestions for improvements to the feature and the code are welcome.
