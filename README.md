@@ -1,12 +1,5 @@
 ![](https://github.com/Meith0717/BondMarket/blob/main/Images/BondMarket_Logo_white.png)
 
->**V4.1 Coming Soon**
-> - Spelling Correnctures
-> - Better PDF Look
-> - New Window Frame
-> - New Modern App Icon
-> - New Menu Bar
-
 ## **Introduction**
 This program is designed to manage your finances within a group 
 or relationship. If you and your partner want to share your 
