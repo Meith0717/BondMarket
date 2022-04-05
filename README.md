@@ -33,9 +33,10 @@ and close the app, you will be warned. The contents of the
 expenditure and debt windows are automatically updated after 
 adding new data. 
 
-## **Fun facts**
+## **Some tips**
 - You can change the appearance of the UI between light and dark..
--  If you want to share the same entries in a group, you can 
+- The entries in the table are filtered by months and years to get a better overview.
+- If you want to share the same entries in a group, you can 
 share a new ***.pkl** file via **File -> New File** in a folder 
 within a cloud service of your choice. To open this shared file, 
 simply click on **File -> Open File** and open the desired file.
