@@ -2,20 +2,20 @@ import customtkinter as ctk
 from customtkinter.theme_manager import ThemeManager
 from datetime import date as datetime
 from tkinter import messagebox
-from app.app_state import App_State, Expenditure_Strukture
+from app.app_state import AppState, ExpenditureStrukture
 
 # Filter Frame ###########################################################################
 
 
-def draw_table_settings(main_root, app_state: App_State, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int):
+def draw_table_settings(main_root, app_state: AppState, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int):
 
-    def filter(app_state: App_State):
+    def filter(app_state: AppState):
         app_state.table_state.month_filter = e1.get()
         app_state.table_state.year_filter = e2.get()
         slider.set(0)
         update_table(app_state)
 
-    def sort(argument: str, app_state: App_State) -> None:
+    def sort(argument: str, app_state: AppState) -> None:
         app_state.table_state.sort_argument = argument
         update_table(app_state)
 
@@ -58,10 +58,10 @@ def draw_table_settings(main_root, app_state: App_State, side: str, anchor: str,
 # Entrys Funktions #####################################################################
 
 
-def draw_entrys(main_root, app_state: App_State, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int):
+def draw_entrys(main_root, app_state: AppState, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int):
     global e1, e2, e3, e4
 
-    def add_to_table_array(app_state: App_State, person_name: str, amount: float, comment: str, date: str):
+    def add_to_table_array(app_state: AppState, person_name: str, amount: float, comment: str, date: str):
         if person_name == '' and amount == '' and comment == '':
             pass
         elif person_name == '':
@@ -79,7 +79,7 @@ def draw_entrys(main_root, app_state: App_State, side: str, anchor: str, fill: s
             e3.delete(0, 'end')
             e4.delete(0, 'end')
 
-    def remove_from_table_array(app_state: App_State, person_name: str, amount: float, comment: str, date: str):
+    def remove_from_table_array(app_state: AppState, person_name: str, amount: float, comment: str, date: str):
         app_state.remove_expenditure(person_name, float(amount), comment, date)
         update_table(app_state)
         e1.delete(0, 'end')
@@ -125,12 +125,12 @@ def draw_entrys(main_root, app_state: App_State, side: str, anchor: str, fill: s
 # Table Funktions ######################################################################
 
 
-def changet_table_index(app_state: App_State, value: int):
+def changet_table_index(app_state: AppState, value: int):
     app_state.table_state.index = int(value)
     update_table(app_state)
 
 
-def update_table(app_state: App_State):
+def update_table(app_state: AppState):
     app_state.get_table_array()
     n = len(app_state.table_state.table_array)-10
     if n == 0:
@@ -140,7 +140,7 @@ def update_table(app_state: App_State):
                       command=lambda value: changet_table_index(app_state, value))
     for i in range(10):
         try:
-            expenditure: Expenditure_Strukture = app_state.table_state.table_array[
+            expenditure: ExpenditureStrukture = app_state.table_state.table_array[
                 i+app_state.table_state.index]
             name_lables[i].config(text=f"{expenditure.person_name}")
             info_lables[i].config(text=f"{expenditure.comment}")
@@ -155,15 +155,15 @@ def update_table(app_state: App_State):
             update_table(app_state)
 
 
-def draw_table(main_root, app_state: App_State, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int) -> None:
+def draw_table(main_root, app_state: AppState, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int) -> None:
 
     global name_lables, info_lables, amount_lables, date_lables, slider
     frame_bg = ThemeManager.theme['color']['frame_low']
 
-    def get_row(index: int, app_state: App_State):
+    def get_row(index: int, app_state: AppState):
         '''Returns the clipped row in the input fields'''
         try:
-            expenditure: Expenditure_Strukture = app_state.table_state.table_array[
+            expenditure: ExpenditureStrukture = app_state.table_state.table_array[
                 app_state.table_state.index+index]
             e1.delete(0, 'end')
             e2.delete(0, 'end')
@@ -210,7 +210,7 @@ def draw_table(main_root, app_state: App_State, side: str, anchor: str, fill: st
     app_state.get_table_array()
     for i in range(10):
         row_frames[i].grid(row=i, column=1, padx=5, pady=7)
-        expenditure: Expenditure_Strukture = app_state.table_state.table_array[i]
+        expenditure: ExpenditureStrukture = app_state.table_state.table_array[i]
         name_lables[i].config(text=f"{expenditure.person_name}")
         name_lables[i].grid(row=0, column=0, padx=6, pady=6)
         info_lables[i].config(text=f"{expenditure.comment}")
@@ -236,7 +236,7 @@ def draw_table(main_root, app_state: App_State, side: str, anchor: str, fill: st
 
 # Plot Frame ###########################################################################
 
-def draw_plot_frame(main_root, app_state: App_State, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int) -> None:
+def draw_plot_frame(main_root, app_state: AppState, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int) -> None:
     root = ctk.CTkFrame(main_root, width=600, height=600)
     root.pack(side=side, anchor=anchor, padx=padx, pady=pady,
               ipadx=ipadx, ipady=ipady, expand=False)
@@ -247,7 +247,7 @@ def draw_plot_frame(main_root, app_state: App_State, side: str, anchor: str, fil
 # Main Frame Funktions #################################################################
 
 
-def draw_menue_1(main_root, app_state: App_State):
+def draw_menue_1(main_root, app_state: AppState):
     global root
 
     root = ctk.CTkFrame(

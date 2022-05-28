@@ -1,12 +1,12 @@
 from tkinter import font
 import customtkinter as ctk
 from customtkinter.theme_manager import ThemeManager
-from app.app_state import App_State
+from app.app_state import AppState
 
 # Main Frame Funktions #################################################################
 
 
-def draw_menue_4(main_root, app_state: App_State):
+def draw_menue_4(main_root, app_state: AppState):
     global root
 
     root = ctk.CTkFrame(

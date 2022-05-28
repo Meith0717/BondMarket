@@ -2,7 +2,7 @@ import tkinter as tk
 import customtkinter as ctk
 from customtkinter.theme_manager import ThemeManager
 from customtkinter import appearance_mode_tracker
-from app.app_state import App_State
+from app.app_state import AppState
 from webbrowser import open
 
 
@@ -18,9 +18,9 @@ def draw_info_frame(main_root) -> None:
         'https://discordapp.com/users/773830054726860811/'), height=15).grid(row=1, column=1, padx=5, pady=5)
 
 
-def appearance_frame(main_root, app_state: App_State):
+def appearance_frame(main_root, app_state: AppState):
 
-    def change_dark_mode_switch(app_state: App_State):
+    def change_dark_mode_switch(app_state: AppState):
         if dark_mode_switch.get() == 1:
             ctk.set_appearance_mode("dark")
             app_state.settings["app_settings"]["appearance"] = "dark"
@@ -48,9 +48,9 @@ def appearance_frame(main_root, app_state: App_State):
     ctk.CTkLabel(root, text=s2).pack(side='top', anchor='w', padx=5, pady=5)
 
 
-def currency_frame(main_root, app_state: App_State):
+def currency_frame(main_root, app_state: AppState):
 
-    def change_currency(app_state: App_State):
+    def change_currency(app_state: AppState):
         if e1.get() in ['€', '$', '¥', '£']:
             app_state.settings["app_settings"]["currency"] = e1.get()
             e1.delete(0, 'end')
@@ -73,7 +73,7 @@ def currency_frame(main_root, app_state: App_State):
         app_state)).grid(row=1, column=1, padx=5, pady=5)
 
 
-def file_frame(main_root, app_state: App_State):
+def file_frame(main_root, app_state: AppState):
 
     root = ctk.CTkFrame(main_root)
     root.pack(side='top', fill='x', anchor='w', padx=10, pady=10)
@@ -97,7 +97,7 @@ def file_frame(main_root, app_state: App_State):
         row=2, columnspan=10, padx=5, pady=5, sticky='w')
 
 
-def draw_menue_3(main_root, app_state: App_State):
+def draw_menue_3(main_root, app_state: AppState):
 
     global root
 

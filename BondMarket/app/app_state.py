@@ -58,7 +58,7 @@ class AppState:
     def load_array(self) -> None:
         """Loads the data from the file data.pkl."""
         try:
-            with open(self.settings['app_settings']['file_path'], "rb", encoding="UTF-8") as file:
+            with open(self.settings['app_settings']['file_path'], "rb", encoding=None) as file:
                 self.dtat_array = pickle.load(file)
         except FileNotFoundError:
             pass
@@ -66,7 +66,7 @@ class AppState:
     def save_array(self) -> None:
         """Saves the data to the file data.pkl."""
         try:
-            with open(self.settings['app_settings']['file_path'], "wb", encoding="UTF-8") as file:
+            with open(self.settings['app_settings']['file_path'], "wb", encoding=None) as file:
                 pickle.dump(self.dtat_array, file)
         except FileNotFoundError:
             os.mkdir(f"{doc_path}\\BondMarket 5.0")

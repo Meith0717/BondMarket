@@ -5,13 +5,13 @@ import gui.menues.help_menue as help_menue
 import gui.menues.settings_menue as settings_menue
 from tkinter import PhotoImage
 from customtkinter.theme_manager import ThemeManager
-from app.app_state import App_State
+from app.app_state import AppState
 
 DISABLED = 'disabled'
 NORMAL = 'normal'
 
 
-def show_menue_1(main_root, app_state: App_State) -> None:
+def show_menue_1(main_root, app_state: AppState) -> None:
     '''Shows menu 1 and destroys
     all other menus
     '''
@@ -25,7 +25,7 @@ def show_menue_1(main_root, app_state: App_State) -> None:
     help_menue.destroy_menue_4()
 
 
-def show_menue_2(main_root, app_state: App_State) -> None:
+def show_menue_2(main_root, app_state: AppState) -> None:
     '''Shows menu 2 and destroys
     all other menus
     '''
@@ -39,7 +39,7 @@ def show_menue_2(main_root, app_state: App_State) -> None:
     help_menue.destroy_menue_4()
 
 
-def show_menue_3(main_root, app_state: App_State) -> None:
+def show_menue_3(main_root, app_state: AppState) -> None:
     '''Shows menu 3 and destroys
     all other menus
     '''
@@ -53,7 +53,7 @@ def show_menue_3(main_root, app_state: App_State) -> None:
     help_menue.destroy_menue_4()
 
 
-def show_menue_4(main_root, app_state: App_State) -> None:
+def show_menue_4(main_root, app_state: AppState) -> None:
     '''Shows menu 4 and destroys
     all other menus
     '''
@@ -67,12 +67,12 @@ def show_menue_4(main_root, app_state: App_State) -> None:
     help_menue.draw_menue_4(main_root, app_state)
 
 
-def save(app_state: App_State) -> None:
+def save(app_state: AppState) -> None:
     app_state.save_settings()
     app_state.save_array()
 
 
-def draw_menue(main_root, app_state: App_State) -> None:
+def draw_menue(main_root, app_state: AppState) -> None:
     '''Creates the main menu of the app 
     Location: pack(side='left', fill='y', padx=0, pady=0)
     '''

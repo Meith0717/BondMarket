@@ -2,10 +2,10 @@ import customtkinter as ctk
 import tkinter.messagebox as messagebox
 import gui.menue_frame as menue_frame
 import gui.status_bar as status_bar
-from app.app_state import App_State
+from app.app_state import AppState
 
 
-def exit(app_state: App_State):
+def exit(app_state: AppState):
     if messagebox.askokcancel('BondMarket', 'exit_message'):
         main_root.quit()
 
@@ -13,7 +13,7 @@ def exit(app_state: App_State):
 def mainloop():
     global main_root
 
-    app_state = App_State()
+    app_state = AppState()
     app_state.load_settings()
     app_state.load_array()
     # Set up main Window
