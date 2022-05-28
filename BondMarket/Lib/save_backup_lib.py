@@ -1,4 +1,4 @@
-import Lib.save_data_lib as save_data_lib 
+import lib.save_data_lib as save_data_lib 
 import app.app_lib as app_lib
 import os
 from tkinter import messagebox

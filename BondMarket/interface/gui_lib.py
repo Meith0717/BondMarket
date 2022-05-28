@@ -6,10 +6,10 @@ import tkinter as tk
 import webbrowser
 import tkinter.font
 import app.app_lib as app_lib
-import Lib.save_backup_lib as save_backup_lib
-import Lib.save_pdf_lib as save_pdf_lib 
-import Calculations.debts_lib as debts_lib
-from Lib.save_data_lib import save_data_in_file, save_settings_in_file, read_data_from_file, read_settings_from_file, read_from_pkl
+import lib.save_backup_lib as save_backup_lib
+import lib.save_pdf_lib as save_pdf_lib 
+import calculations.debts_lib as debts_lib
+from lib.save_data_lib import save_data_in_file, save_settings_in_file, read_data_from_file, read_settings_from_file, read_from_pkl
 from app.theme_lib import LIGHT, DARK
 from datetime import date
 from tkinter import messagebox, filedialog

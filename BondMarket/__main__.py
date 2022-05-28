@@ -6,9 +6,9 @@ __version__ = "4.1"
 from ttkthemes import ThemedStyle
 from tkinter import ttk
 from PIL import ImageTk, Image
-import Lib.save_backup_lib as save_backup_lib 
-from Interface.gui_lib import *
-from Interface.welcome_lib import *
+import lib.save_backup_lib as save_backup_lib 
+from interface.gui_lib import *
+from interface.welcome_lib import *
 
 def main():
     '''This is the main function that creates the window.'''
