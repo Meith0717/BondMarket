@@ -13,7 +13,9 @@ SETTINGS = {
         "appearance": "dark",
         "file_path": f"{doc_path}\\BondMarket 5.0\\data.pkl",
         "currency": "\u20ac",
-        "persons_mames": []
+        "persons_mames": {
+            "meith0717@gmail.com": "Meiers Thierry"
+            } 
     },
 }
 

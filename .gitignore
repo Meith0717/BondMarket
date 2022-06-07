@@ -1,3 +1,5 @@
 __pycache__/
 .vscode
-Settings\settings.json
+settings.json
+login.txt
+BondMarket_Config_exe.json
