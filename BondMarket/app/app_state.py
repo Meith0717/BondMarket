@@ -10,14 +10,29 @@ doc_path = os.path.expanduser('~\\Documents')
 SETTINGS = {
     "app_settings":
     {
-        "appearance": "dark",
+        "appearance": "light",
         "file_path": f"{doc_path}\\BondMarket 5.0\\data.pkl",
         "currency": "\u20ac",
-        "persons_mames": {
-            "meith0717@gmail.com": "Meiers Thierry"
-            } 
+        "persons_mames": {} 
     },
+    "main_service": 
+    {
+        "active": 0,
+        "server": '',
+        "user": '',
+        "psw" : ''
+    }
 }
+
+
+def average(d : dict):
+    n: int = len(d)
+    if n == 0:
+        return 0
+    s: int = 0
+    for x in d.values():
+        s += x
+    return round(s/n, 2)
 
 
 @dataclass
@@ -40,12 +55,28 @@ class TableState:
 
 
 @dataclass
+class DebtsStrukture:
+    sender: str
+    receiver: str
+    amount: float
+
+
+@dataclass
+class DebtsState:
+    personal_expenses = {}
+    debts_array = []
+    average_expenses = 0
+
+
+@dataclass
 class AppState:
     """Structure of the app state"""
     data_array = []
     settings = {}
     table_state = TableState()
+    debts_state = DebtsState()
     save_state = True
+    active = False
 
     def load_settings(self) -> None:
         """Loads the data from the file settings.json."""
@@ -123,3 +154,46 @@ class AppState:
         self.data_array.remove(expenditure)
         if state:
             self.get_table_array()
+        
+    def get_personal_expenses(self):
+        self.get_table_array()
+        self.debts_state.personal_expenses = {}
+        for expenditure in self.table_state.table_array:
+            expenditure: ExpenditureStrukture
+            if expenditure.person_name != '':
+                if expenditure.person_name in self.debts_state.personal_expenses:
+                    self.debts_state.personal_expenses[expenditure.person_name] += expenditure.amount
+                else:
+                    self.debts_state.personal_expenses[expenditure.person_name] = expenditure.amount
+        self.debts_state.personal_expenses = dict(sorted(self.debts_state.personal_expenses.items(), key=lambda item: item[1]))
+        self.debts_state.average_expenses = average(self.debts_state.personal_expenses)
+
+    def get_debts_array(self):
+        self.get_personal_expenses()
+        persons = [x for x in self.debts_state.personal_expenses.keys()]
+        amounts = [x for x in self.debts_state.personal_expenses.values()]
+        n = len(persons)
+        for i in range(n-1):
+            if i == 0:
+                amount = round(self.debts_state.average_expenses - amounts[i], 2)
+                if amount != 0:
+                    self.debts_state.debts_array.append(DebtsStrukture(
+                        persons[i], persons[i+1], amount))
+            else:
+                amount = round(self.debts_state.average_expenses - amounts[i] + self.debts_state.debts_array[i-1].amount, 2)
+                if amount != 0:
+                    self.debts_state.debts_array.append(DebtsStrukture(
+                        persons[i], persons[i+1], amount))
+        print(self.debts_state.debts_array, self.debts_state.average_expenses)
+
+    def check_names(self):
+        names = []
+        for expenses in self.data_array:
+            expenses: ExpenditureStrukture
+            if expenses.person_name not in names:
+                names.append(expenses.person_name)
+    
+        for name in names:
+            if name not in self.settings['app_settings']['persons_mames']:
+                return False
+        return True

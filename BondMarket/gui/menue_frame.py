@@ -83,7 +83,6 @@ def draw_menue(main_root, app_state: AppState) -> None:
     # Define some Values
     logo = PhotoImage(file=r"Icons\BondMarket_Icon.png")
     text_color = ThemeManager.theme['color']['text']
-    text_color_disabled = ThemeManager.theme['color']['window_bg_color']
     text_font = ('Segoe UI', 15)
     # Create Menue Buttons
     ctk.CTkButton(root,

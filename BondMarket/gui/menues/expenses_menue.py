@@ -1,9 +1,9 @@
-import customtkinter as ctk
-from customtkinter.theme_manager import ThemeManager
-from datetime import date as datetime
-from tkinter import messagebox
 from app.app_state import AppState, ExpenditureStrukture
 
+import customtkinter as ctk
+from tkinter import messagebox
+from datetime import date as datetime
+from customtkinter.theme_manager import ThemeManager
 # Filter Frame ###########################################################################
 
 
@@ -60,6 +60,10 @@ def draw_table_settings(main_root, app_state: AppState, side: str, anchor: str, 
 
 # Entrys Funktions #####################################################################
 
+def update_combox(app_state: AppState):
+    e1.config(values=[key for key in app_state.settings["app_settings"]["persons_mames"].keys()])
+    e1.set('')
+
 
 def draw_entrys(main_root, app_state: AppState, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int):
     global e1, e2, e3, e4
@@ -77,16 +81,19 @@ def draw_entrys(main_root, app_state: AppState, side: str, anchor: str, fill: st
             app_state.append_expenditure(
                 person_name, float(amount), comment, date)
             update_table(app_state)
-            e1.delete(0, 'end')
+            e1.set('')
             e2.delete(0, 'end')
             e3.delete(0, 'end')
             e4.delete(0, 'end')
             app_state.save_state = False
+        if app_state.check_names()  is False:
+            messagebox.showwarning('BondMarket', 'A user was detected in the table which was not registered ')
+        
 
     def remove_from_table_array(app_state: AppState, person_name: str, amount: float, comment: str, date: str):
+        print()
         app_state.remove_expenditure(person_name, float(amount), comment, date)
         update_table(app_state)
-        e1.delete(0, 'end')
         e2.delete(0, 'end')
         e3.delete(0, 'end')
         e4.delete(0, 'end')
@@ -106,10 +113,11 @@ def draw_entrys(main_root, app_state: AppState, side: str, anchor: str, fill: st
                  ).grid(row=3, column=0, pady=5, padx=20, sticky='e')
     ctk.CTkLabel(root, text='          Date:'
                  ).grid(row=4, column=0, pady=5, padx=20, sticky='e')
-    e1 = ctk.CTkEntry(root, width=200)
+    e1 = ctk.CTkComboBox(root, width=200, hover=False, values=[key for key in app_state.settings["app_settings"]["persons_mames"].keys()])
     e2 = ctk.CTkEntry(root, width=200)
     e3 = ctk.CTkEntry(root, width=200)
     e4 = ctk.CTkEntry(root, width=200)
+    e1.set('')
     e1.grid(row=1, column=1, pady=5, padx=20)
     e2.grid(row=2, column=1, pady=5, padx=20)
     e3.grid(row=3, column=1, pady=5, padx=20)
@@ -170,11 +178,10 @@ def draw_table(main_root, app_state: AppState, side: str, anchor: str, fill: str
         try:
             expenditure: ExpenditureStrukture = app_state.table_state.table_array[
                 app_state.table_state.index+index]
-            e1.delete(0, 'end')
             e2.delete(0, 'end')
             e3.delete(0, 'end')
             e4.delete(0, 'end')
-            e1.insert(0, expenditure.person_name)
+            e1.set(expenditure.person_name)
             e2.insert(0, expenditure.amount)
             e3.insert(0, expenditure.comment)
             e4.insert(0, expenditure.date)
@@ -185,12 +192,12 @@ def draw_table(main_root, app_state: AppState, side: str, anchor: str, fill: str
     root.pack(side=side, anchor=anchor, padx=padx, pady=pady,
               ipadx=ipadx, ipady=ipady, expand=False)
     row_frames = [ctk.CTkFrame(
-        root, height=55, width=350, fg_color=frame_bg) for i in range(10)]
+        root, height=55, width=550, fg_color=frame_bg) for i in range(10)]
     name_lables = [ctk.CTkLabel(row_frames[i], text_font=(
-        'San Francisco', 16), width=200) for i in range(10)]
-    info_lables = [ctk.CTkLabel(row_frames[i], width=200) for i in range(10)]
+        'San Francisco', 16), width=300) for i in range(10)]
+    info_lables = [ctk.CTkLabel(row_frames[i], width=300) for i in range(10)]
     amount_lables = [ctk.CTkLabel(row_frames[i], text_font=(
-        'San Francisco', 18), width=200) for i in range(10)]
+        'San Francisco', 18), width=300) for i in range(10)]
     date_lables = [ctk.CTkLabel(row_frames[i]) for i in range(10)]
     ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
         0, app_state)).grid(row=0, column=0, padx=20, pady=5)
@@ -241,7 +248,7 @@ def draw_table(main_root, app_state: AppState, side: str, anchor: str, fill: str
 
 # Plot Frame ###########################################################################
 
-def draw_plot_frame(main_root, app_state: AppState, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int) -> None:
+def draw_info_frame(main_root, app_state: AppState, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int) -> None:
     root = ctk.CTkFrame(main_root, width=600, height=600)
     root.pack(side=side, anchor=anchor, padx=padx, pady=pady,
               ipadx=ipadx, ipady=ipady, expand=False)
@@ -262,7 +269,7 @@ def draw_menue_1(main_root, app_state: AppState):
     draw_table(root, app_state, 'left', 'nw', 'both', 10, 10, 10, 10)
     draw_entrys(root, app_state, 'top', 'nw', 'both', 10, 10, 10, 10)
     draw_table_settings(root, app_state, 'top', 'nw', 'both', 10, 10, 10, 10)
-    draw_plot_frame(root, app_state, 'top', 'nw', 'both', 10, 10, 10, 10)
+    draw_info_frame(root, app_state, 'top', 'nw', 'both', 10, 10, 10, 10)
     root.pack(padx=20, pady=10, ipady=500, fill='both', expand=True)
     root.canvas.bind('<Return>', lambda: print('pass'))
 
