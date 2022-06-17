@@ -3,7 +3,6 @@
 >**V5.0 Coming Soon**
 
 # Author
-:bust_in_silhouette:  Thierry Meiers
 - Discord: [@meith0717#8799](https://discordapp.com/users/773830054726860811/)
 # Show your support
 Give a :star: if you like this project. 

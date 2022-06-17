@@ -1,3 +1,4 @@
+from pickle import APPEND
 from tkinter import font
 import customtkinter as ctk
 from customtkinter.theme_manager import ThemeManager

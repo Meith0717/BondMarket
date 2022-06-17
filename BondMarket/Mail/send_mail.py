@@ -18,16 +18,59 @@ Hey {name}
 I am the mail service of the app BondMarket. With my help, you can easily\
 enter purchases from anywhere. I hereby confirm that your mail will not be\
 ignored in the future!
-To add data, please send a mail with exactly this text in your subject\
-field: 
 
-BondMarket: add quantity,location
+__List of commands__
 
-Please use a dot for floating point numbers! e.g.: 10.55
+Add new data:
+-add quantity,location (use a dot for floating point numbers! e.g.: 10.55)
 
-best regards
+Do you need help:
+-help
 
+Commandos are written to the subjects, text is ignored!
+
+Best regards,
 BondMarket Mail Service 
+_________________________________________
+
+Hallo {name}
+
+Ich bin der Maildienst der App BondMarket. Mit meiner Hilfe kannst du ganz einfach
+Käufe von überall aus eingeben. Ich bestätige hiermit, dass deine Mail nicht
+in Zukunft nicht mehr ignoriert wird!
+
+__Liste der Befehle__
+
+Neue Daten hinzufügen:
+-Menge,Ort hinzufügen (bei Fließkommazahlen einen Punkt verwenden! z.B.: 10.55)
+
+Benötigen Sie Hilfe?
+-help
+
+Befehle werden in die Fächer geschrieben, Text wird ignoriert!
+
+Mit freundlichen Grüßen,
+BondMarket Mail Dienst 
+_________________________________________
+
+Salut {name}
+
+Je suis le service de messagerie de l'application BondMarket. Avec mon aide, vous pouvez facilement\
+saisir des achats de n'importe où. Je confirme par la présente que votre courrier ne sera pas\
+ignoré à l'avenir !
+
+__Liste des commandes__
+
+Ajouter de nouvelles données :
+-add quantity,location (utilisez un point pour les nombres à virgule flottante ! ex. : 10.55)
+
+Avez-vous besoin d'aide ?
+-help
+
+Les commandes sont écrites dans les sujets, le texte est ignoré !
+
+Meilleures salutations,
+Service courrier de BondMarket 
 """
     
     msg = EmailMessage()
@@ -60,7 +103,7 @@ your Date:
 were added!
 
 Best regards,
-BondMarket Mail Service 
+BondMarket Mail Service
 """
     
     msg = EmailMessage()

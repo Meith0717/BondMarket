@@ -1,48 +1,86 @@
+"""System module."""
+from typing import Any
 from app.app_state import AppState, ExpenditureStrukture
-
-import customtkinter as ctk
 from tkinter import messagebox
 from datetime import date as datetime
 from customtkinter.theme_manager import ThemeManager
-# Filter Frame ###########################################################################
+import customtkinter as ctk
+
+PADX = PADY = IPADX = IPADY = 10
+FRAME_BG = ThemeManager.theme['color']['frame_low']
+YEARS = [str(2000+x) for x in range(22, 30)]
+MONTHS = ['01', '02', '03', '04', '05', '06',
+          '07', '08', '09', '10', '11', '12']
 
 
-def draw_table_settings(main_root, app_state: AppState, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int):
+def table_filter(main_root: ctk.CTk, app_state: AppState) -> None:
+    """The funkrion grinds the frame with the settings for the table.
 
-    def set_month(value, app_state: AppState):
+    Args:
+        main_root (ctk.CTk)
+        app_state (AppState)
+    """
+
+    def set_month(value: Any, app_state: AppState) -> None:
+        """The function filters the table by month
+
+        Args:
+            value (Any)
+            app_state (AppState)
+        """
         app_state.table_state.month_filter = value
         update_table(app_state)
 
-    def set_year(value, app_state: AppState):
+    def set_year(value: Any, app_state: AppState) -> None:
+        """The function filters the table by year
+
+        Args:
+            value (Any)
+            app_state (AppState)
+        """
         app_state.table_state.year_filter = value
         update_table(app_state)
 
     def sort(argument: str, app_state: AppState) -> None:
+        """The function sorts the table according to the
+            sort argument
+
+        Args:
+            argument (str)
+            app_state (AppState)
+        """
         app_state.table_state.sort_argument = argument
         update_table(app_state)
-    
-    months: list = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '','']
 
     root = ctk.CTkFrame(main_root)
-    root.pack(side=side, anchor=anchor, padx=padx,
-              pady=pady, ipadx=ipadx, ipady=ipady, expand=False)
-    ctk.CTkLabel(root, text='Filter           ', text_font=('Segoe UI', 20)
+    root.pack(side='top', anchor='nw', fill='both',
+              padx=PADX, pady=PADY, ipadx=IPADX,
+              ipady=IPADY, expand=False)
+
+    ctk.CTkLabel(root, text='Filter', text_font=('Segoe UI', 20)
                  ).grid(row=0, column=0, pady=5, padx=20, sticky='w')
-    ctk.CTkLabel(root, text='           Month:'
+    ctk.CTkLabel(root, text='Month:'
                  ).grid(row=1, column=0, pady=5, padx=20, sticky='e')
-    ctk.CTkLabel(root, text='            Year:'
+    ctk.CTkLabel(root, text='Year:'
                  ).grid(row=2, column=0, pady=5, padx=20, sticky='e')
-    ctk.CTkLabel(root, text='     Comment Key:'
+    ctk.CTkLabel(root, text='Comment Key:'
                  ).grid(row=3, column=0, pady=5, padx=20, sticky='e')
-    e1 = ctk.CTkComboBox(root, width=200, values=months, command=lambda value: set_month(value, app_state))
-    e2 = ctk.CTkComboBox(root, width=200, values=[str(2000+x) for x in range(22, 30)], command=lambda value: set_year(value, app_state))
-    e3 = ctk.CTkEntry(root, width=200)
-    e2.set(app_state.table_state.year_filter)
+
+    e1 = ctk.CTkComboBox(root, width=200, values=MONTHS,
+                         command=lambda value: set_month(value, app_state))
     e1.set(app_state.table_state.month_filter)
     e1.grid(row=1, column=1, pady=5, sticky='w', padx=20)
+
+    e2 = ctk.CTkComboBox(root, width=200, values=YEARS,
+                         command=lambda value: set_year(value, app_state))
+    e2.set(app_state.table_state.year_filter)
     e2.grid(row=2, column=1, pady=5, sticky='w', padx=20)
+
+    e3 = ctk.CTkEntry(root, width=200)
     e3.grid(row=3, column=1, pady=5, sticky='w', padx=20)
+
     ctk.CTkButton(root, text='Search').grid(row=4, pady=5, padx=20)
+
     ctk.CTkLabel(root, text='Sort', text_font=('Segoe UI', 15),
                  width=100).grid(row=5, column=0, padx=20, pady=5)
     ctk.CTkButton(root, text='Date up',
@@ -58,40 +96,70 @@ def draw_table_settings(main_root, app_state: AppState, side: str, anchor: str, 
                   command=lambda: sort('Amount down', app_state)
                   ).grid(row=7, column=1, padx=20, pady=5)
 
-# Entrys Funktions #####################################################################
 
-def update_combox(app_state: AppState):
-    e1.config(values=[key for key in app_state.settings["app_settings"]["persons_mames"].keys()])
+def update_entrys_combox(app_state: AppState) -> None:
+    """Updates the Combox in the Entry Frame
+
+    Args:
+        app_state (AppState)
+    """
+    e1.config(values=list(
+        app_state.settings["app_settings"]["persons_mames"].keys()))
     e1.set('')
 
 
-def draw_entrys(main_root, app_state: AppState, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int):
+def entrys(main_root, app_state: AppState) -> None:
+    """The funkrion grinds the frame with the entrys for the table.
+
+    Args:
+        main_root (_type_)
+        app_state (AppState)
+    """
     global e1, e2, e3, e4
 
-    def add_to_table_array(app_state: AppState, person_name: str, amount: float, comment: str, date: str):
-        if person_name == '' and amount == '' and comment == '':
-            pass
-        elif person_name == '':
-            messagebox.showerror('BondMarket', 'Please enter a name')
-        elif amount == '':
-            messagebox.showerror('BondMarket', 'Please enter an amount')
-        elif date == '':
-            messagebox.showerror('BondMarket', 'Please enter a date')
-        else:
-            app_state.append_expenditure(
-                person_name, float(amount), comment, date)
-            update_table(app_state)
-            e1.set('')
-            e2.delete(0, 'end')
-            e3.delete(0, 'end')
-            e4.delete(0, 'end')
-            app_state.save_state = False
-        if app_state.check_names()  is False:
-            messagebox.showwarning('BondMarket', 'A user was detected in the table which was not registered ')
-        
+    def add_to_table_array(app_state: AppState, person_name: str,
+                           amount: float, comment: str, date: str) -> None:
+        """Adds an ExpenditureStrukture to the table
 
-    def remove_from_table_array(app_state: AppState, person_name: str, amount: float, comment: str, date: str):
-        print()
+        Args:
+            app_state (AppState)
+            person_name (str)
+            amount (float)
+            comment (str)
+            date (str)
+        """
+        if person_name != '' and amount != '' and comment != '':
+            if person_name == '':
+                messagebox.showerror('BondMarket', 'Please enter a name')
+            elif amount == '':
+                messagebox.showerror('BondMarket', 'Please enter an amount')
+            elif date == '':
+                messagebox.showerror('BondMarket', 'Please enter a date')
+            else:
+                app_state.append_expenditure(
+                    person_name, float(amount), comment, date)
+                update_table(app_state)
+                e1.set('')
+                e2.delete(0, 'end')
+                e3.delete(0, 'end')
+                e4.delete(0, 'end')
+                e4.insert(0, datetime.today().strftime('%Y.%m.%d'))
+                app_state.save_state = False
+            if app_state.check_names() is False:
+                messagebox.showwarning(
+                    'BondMarket', 'A user was detected in the table which was not registered ')
+
+    def remove_from_table_array(app_state: AppState, person_name: str,
+                                amount: float, comment: str, date: str) -> None:
+        """Remove the given ExpenditureStrukture from the table
+
+        Args:
+            app_state (AppState)
+            person_name (str)
+            amount (float)
+            comment (str)
+            date (str)
+        """
         app_state.remove_expenditure(person_name, float(amount), comment, date)
         update_table(app_state)
         e2.delete(0, 'end')
@@ -101,8 +169,9 @@ def draw_entrys(main_root, app_state: AppState, side: str, anchor: str, fill: st
         app_state.save_state = False
 
     root = ctk.CTkFrame(main_root)
-    root.pack(side=side, anchor=anchor, padx=padx, pady=pady,
-              ipadx=ipadx, ipady=ipady, expand=False)
+    root.pack(side='top', anchor='nw', fill='both', padx=PADX,
+              pady=PADY, ipadx=IPADX, ipady=IPADY, expand=False)
+
     ctk.CTkLabel(root, text='Entrys         ', text_font=('Segoe UI', 20)
                  ).grid(row=0, column=0, pady=5, padx=20, sticky='w')
     ctk.CTkLabel(root, text='   Person Name:'
@@ -113,37 +182,51 @@ def draw_entrys(main_root, app_state: AppState, side: str, anchor: str, fill: st
                  ).grid(row=3, column=0, pady=5, padx=20, sticky='e')
     ctk.CTkLabel(root, text='          Date:'
                  ).grid(row=4, column=0, pady=5, padx=20, sticky='e')
-    e1 = ctk.CTkComboBox(root, width=200, hover=False, values=[key for key in app_state.settings["app_settings"]["persons_mames"].keys()])
+
+    e1 = ctk.CTkComboBox(root, width=200, hover=False,
+                         values=list(app_state.settings["app_settings"]["persons_mames"].keys()))
     e2 = ctk.CTkEntry(root, width=200)
     e3 = ctk.CTkEntry(root, width=200)
     e4 = ctk.CTkEntry(root, width=200)
+
     e1.set('')
     e1.grid(row=1, column=1, pady=5, padx=20)
     e2.grid(row=2, column=1, pady=5, padx=20)
     e3.grid(row=3, column=1, pady=5, padx=20)
     e4.grid(row=4, column=1, pady=5, padx=20)
     e4.insert(0, datetime.today().strftime('%Y.%m.%d'))
+
     ctk.CTkButton(root, text='Add',
                   command=lambda: add_to_table_array(
                       app_state, e1.get(), e2.get(), e3.get(), e4.get())
                   ).grid(row=5, column=0, pady=5, padx=20)
+
     ctk.CTkButton(root, text='Change'
                   ).grid(row=6, column=0, pady=5, padx=20)
+
     ctk.CTkButton(root, text='Delete',
                   command=lambda: remove_from_table_array(
                       app_state, e1.get(), e2.get(), e3.get(), e4.get())
                   ).grid(row=7, column=0, pady=5, padx=20)
 
 
-# Table Funktions ######################################################################
+def changet_table_index(app_state: AppState, value: Any) -> None:
+    """Changes the index for scrolling
 
-
-def changet_table_index(app_state: AppState, value: int):
+    Args:
+        app_state (AppState)
+        value (int): value from the slider
+    """
     app_state.table_state.index = int(value)
     update_table(app_state)
 
 
-def update_table(app_state: AppState):
+def update_table(app_state: AppState) -> None:
+    """Updates the content of the table
+
+    Args:
+        app_state (AppState)
+    """
     app_state.get_table_array()
     n = len(app_state.table_state.table_array)-10
     if n == 0:
@@ -168,13 +251,22 @@ def update_table(app_state: AppState):
             update_table(app_state)
 
 
-def draw_table(main_root, app_state: AppState, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int) -> None:
+def table(main_root, app_state: AppState) -> None:
+    """The funkrion grinds the table.
 
+    Args:
+        main_root (_type_)
+        app_state (AppState)
+    """
     global name_lables, info_lables, amount_lables, date_lables, slider
-    frame_bg = ThemeManager.theme['color']['frame_low']
 
-    def get_row(index: int, app_state: AppState):
-        '''Returns the clipped row in the input fields'''
+    def get_row(index: int, app_state: AppState) -> None:
+        """Returns the clipped row in the input fields
+
+        Args:
+            index (int): _description_
+            app_state (AppState): _description_
+        """
         try:
             expenditure: ExpenditureStrukture = app_state.table_state.table_array[
                 app_state.table_state.index+index]
@@ -188,17 +280,23 @@ def draw_table(main_root, app_state: AppState, side: str, anchor: str, fill: str
         except IndexError:
             pass
 
-    root = ctk.CTkFrame(main_root)
-    root.pack(side=side, anchor=anchor, padx=padx, pady=pady,
-              ipadx=ipadx, ipady=ipady, expand=False)
+    root = ctk.CTkFrame(main_root,  fg_color=None)
+    root.pack(side='left', anchor='nw', fill='both', padx=PADX,
+              pady=PADY, ipadx=IPADX, ipady=IPADY, expand=False)
+    
     row_frames = [ctk.CTkFrame(
-        root, height=55, width=550, fg_color=frame_bg) for i in range(10)]
+        root, height=55, width=550) for i in range(10)]
+    
     name_lables = [ctk.CTkLabel(row_frames[i], text_font=(
         'San Francisco', 16), width=300) for i in range(10)]
+    
     info_lables = [ctk.CTkLabel(row_frames[i], width=300) for i in range(10)]
+    
     amount_lables = [ctk.CTkLabel(row_frames[i], text_font=(
         'San Francisco', 18), width=300) for i in range(10)]
+    
     date_lables = [ctk.CTkLabel(row_frames[i]) for i in range(10)]
+    
     ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
         0, app_state)).grid(row=0, column=0, padx=20, pady=5)
     ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
@@ -219,9 +317,11 @@ def draw_table(main_root, app_state: AppState, side: str, anchor: str, fill: str
         8, app_state)).grid(row=8, column=0, padx=20, pady=5)
     ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
         9, app_state)).grid(row=9, column=0, padx=20, pady=5)
+    
     app_state.get_table_array()
+    
     for i in range(10):
-        row_frames[i].grid(row=i, column=1, padx=5, pady=7)
+        row_frames[i].grid(row=i, column=1, padx=5, pady=4)
         expenditure: ExpenditureStrukture = app_state.table_state.table_array[i]
         name_lables[i].config(text=f"{expenditure.person_name}")
         name_lables[i].grid(row=0, column=0, padx=6, pady=6)
@@ -229,52 +329,65 @@ def draw_table(main_root, app_state: AppState, side: str, anchor: str, fill: str
         info_lables[i].grid(row=1, column=0, padx=6, pady=6)
         date_lables[i].config(text=f"{expenditure.date}")
         date_lables[i].grid(row=1, column=1, padx=6, pady=6)
-        if expenditure.amount == 0:
+        amount_lables[i].grid(row=0, rowspan=3, column=2, padx=6, pady=5)
+        if expenditure.amount != 0:
             amount_lables[i].config(text="")
         else:
             amount_lables[i].config(
                 text=f"- {expenditure.amount} {app_state.settings['app_settings']['currency']}")
-        amount_lables[i].grid(row=0, rowspan=3, column=2, padx=6, pady=5)
-    n = len(app_state.table_state.table_array)-10
-    if n == 0:
+    array_len = len(app_state.table_state.table_array)-10
+    if array_len == 0:
         slider = ctk.CTkSlider(root, from_=100, to=0,
-                               orient="vertical", height=750)
+                               orient="vertical", height=750, button_color=FRAME_BG, )
     else:
-        slider = ctk.CTkSlider(root, from_=n, to=0, command=lambda value: changet_table_index(
-            app_state, value), orient="vertical", number_of_steps=n, height=750)
+        slider = ctk.CTkSlider(root, from_=array_len, to=0, 
+                               command=lambda value: changet_table_index(app_state,
+                                                                         value, button_color=FRAME_BG
+                                                                         ),
+                               orient="vertical", number_of_steps=array_len, height=750)
     slider.set(0)
     slider.grid(row=0, rowspan=9, column=2)
 
 
-# Plot Frame ###########################################################################
+def draw_info_frame(main_root, app_state: AppState) -> None:
+    """_summary_
 
-def draw_info_frame(main_root, app_state: AppState, side: str, anchor: str, fill: str, padx: int, pady: int, ipadx: int, ipady: int) -> None:
+    Args:
+        main_root (_type_)
+        app_state (AppState)
+    """
     root = ctk.CTkFrame(main_root, width=600, height=600)
-    root.pack(side=side, anchor=anchor, padx=padx, pady=pady,
-              ipadx=ipadx, ipady=ipady, expand=False)
+    root.pack(side='top', anchor='nw', fill='both', padx=PADX,
+              pady=PADY, ipadx=IPADX, ipady=IPADY, expand=False)
 
     ctk.CTkLabel(root, text='Info           ', text_font=('Segoe UI', 20)
                  ).grid(row=0, column=0, pady=5, padx=20, sticky='w')
 
-# Main Frame Funktions #################################################################
 
+def draw_menue_1(main_root: ctk.CTk, app_state: AppState) -> None:
+    """_summary_
 
-def draw_menue_1(main_root, app_state: AppState):
+    Args:
+        main_root (ctk.CTk)
+        app_state (AppState)
+    """
     global root
 
     root = ctk.CTkFrame(
         main_root, fg_color=ThemeManager.theme['color']['window_bg_color'])
     title = ctk.CTkLabel(root, text='Expanses', text_font=('Segoe UI', 20))
     title.pack(side='top', anchor='w', padx=5, pady=5)
-    draw_table(root, app_state, 'left', 'nw', 'both', 10, 10, 10, 10)
-    draw_entrys(root, app_state, 'top', 'nw', 'both', 10, 10, 10, 10)
-    draw_table_settings(root, app_state, 'top', 'nw', 'both', 10, 10, 10, 10)
-    draw_info_frame(root, app_state, 'top', 'nw', 'both', 10, 10, 10, 10)
+    table(root, app_state)
+    entrys(root, app_state)
+    table_filter(root, app_state)
+    draw_info_frame(root, app_state)
     root.pack(padx=20, pady=10, ipady=500, fill='both', expand=True)
     root.canvas.bind('<Return>', lambda: print('pass'))
 
 
-def destroy_menue_1():
+def destroy_menue_1() -> None:
+    """_summary_
+    """
     try:
         root.destroy()
     except:

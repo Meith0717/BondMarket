@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from app.app_state import APP_AUTHOR, APP_VERSION, LANGUAGE_VERSION
 
 
 def draw_status_bar(main_root: ctk.CTk) -> None:
@@ -12,7 +13,7 @@ def draw_status_bar(main_root: ctk.CTk) -> None:
                         )
     root.pack(side='bottom', fill='x', pady=4, padx=4)
     ctk.CTkLabel(root,
-                 text=f'Python 3.10.1  |  Copyright © 2022 Thierry Meiers  |  Version _Beta_',
+                 text=f'Python {LANGUAGE_VERSION}  |  Copyright © 2022 {APP_AUTHOR}  |  Version:{APP_VERSION}',
                  width=80,
                  height=20,
                  ).pack()
