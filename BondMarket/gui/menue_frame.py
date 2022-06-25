@@ -78,10 +78,14 @@ def draw_menue(main_root, app_state: AppState) -> None:
     '''
     global menue_1_button, menue_2_button, menue_3_button, menue_4_button
     # Create Frame
-    root = ctk.CTkFrame(main_root, width=60)
-    root.pack(side='left', fill='y', padx=10, pady=10)
+    root = ctk.CTkFrame(main_root, width=200)
+    root.pack(side='left', fill='y', padx=10, pady=5)
     # Define some Values
     logo = PhotoImage(file=r"Icons\BondMarket_Icon.png")
+    settings = PhotoImage(file=r"Icons\settings.png")
+    help = PhotoImage(file=r"Icons\help.png")
+    expenses = PhotoImage(file=r"Icons\finance.png")
+    debts = PhotoImage(file=r"Icons\debts.png")
     text_color = ThemeManager.theme['color']['text']
     text_font = ('Segoe UI', 15)
     # Create Menue Buttons
@@ -98,6 +102,7 @@ def draw_menue(main_root, app_state: AppState) -> None:
                   ).pack(side='top', padx=5, pady=20)
     menue_1_button = ctk.CTkButton(root,
                                    text='Expenses',
+                                   image=expenses,
                                    width=20,
                                    command=lambda: show_menue_1(
                                        main_root, app_state),
@@ -108,7 +113,8 @@ def draw_menue(main_root, app_state: AppState) -> None:
                                    )
     menue_2_button = ctk.CTkButton(root,
                                    text='Debts',
-                                   width=10,
+                                   image=debts,
+                                   width=20,
                                    command=lambda: show_menue_2(
                                        main_root, app_state),
                                    fg_color=None,
@@ -118,7 +124,8 @@ def draw_menue(main_root, app_state: AppState) -> None:
                                    )
     menue_3_button = ctk.CTkButton(root,
                                    text='Settings',
-                                   width=10,
+                                   image=settings,
+                                   width=20,
                                    command=lambda: show_menue_3(
                                        main_root, app_state),
                                    fg_color=None,
@@ -128,7 +135,8 @@ def draw_menue(main_root, app_state: AppState) -> None:
                                    )
     menue_4_button = ctk.CTkButton(root,
                                    text='Help',
-                                   width=10,
+                                   image=help,
+                                   width=20,
                                    command=lambda: show_menue_4(
                                        main_root, app_state),
                                    fg_color=None,
@@ -143,10 +151,10 @@ def draw_menue(main_root, app_state: AppState) -> None:
     PDF_button = ctk.CTkButton(root,
                                text='PDF',
                                width=10)
-    menue_1_button.pack(side='top', padx=5, pady=40, anchor='c')
-    menue_2_button.pack(side='top', padx=5, pady=40, anchor='c')
-    menue_3_button.pack(side='top', padx=5, pady=40, anchor='c')
-    menue_4_button.pack(side='top', padx=5, pady=40, anchor='c')
+    menue_1_button.pack(side='top', padx=5, pady=40, anchor='w')
+    menue_2_button.pack(side='top', padx=5, pady=40, anchor='w')
+    menue_3_button.pack(side='top', padx=5, pady=40, anchor='w')
+    menue_4_button.pack(side='top', padx=5, pady=40, anchor='w')
     PDF_button.pack(side='bottom', padx=5, pady=10)
     save_button.pack(side='bottom', padx=5, pady=10)
     ctk.CTkLabel(root, text='_____________').pack(

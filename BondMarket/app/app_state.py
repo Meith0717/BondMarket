@@ -5,11 +5,10 @@ import os
 import json
 import pickle
 import subprocess
-import sys
 
 APP_VERSION = '_beta_'
 APP_AUTHOR = 'Thierry Meiers'
-LANGUAGE_VERSION = 'sys.version'
+LANGUAGE_VERSION = 3.10
 
 DOC_PATH = os.path.expanduser('~\\Documents')
 APP_DIR_PATH = f"{DOC_PATH}\\BondMarket {APP_VERSION}"
@@ -19,7 +18,7 @@ APP_LOG_DIR_PATH = f"{APP_DIR_PATH}\\App Log"
 MS_LOG_DIR_PATH = f"{APP_DIR_PATH}\\Mail Service Log"
 SETTINGS = {
     "app_settings":
-    {
+    { 
         "appearance": "light",
         "file_path": f"{DATA_DIR_PATH}\\data.pkl",
         "currency": "\u20ac",
@@ -201,13 +200,11 @@ class AppState:
         self.table_state.table_array = []
         for expenditure in self.data_array:
             expenditure: ExpenditureStrukture
-            date_filter: str = f"{self.table_state.year_filter}\
-                .{self.table_state.month_filter}"
-
+            date_filter: str = f"{self.table_state.year_filter}.{self.table_state.month_filter}"
             if date_filter in expenditure.date:
                 self.table_state.table_array.append(expenditure)
 
-        if (len(self.table_state.table_array) % 10) != 0 or \
+        if len(self.table_state.table_array) < 10 or \
                 not self.table_state.table_array:
 
             for _ in range(10 - (len(self.table_state.table_array) % 10)):

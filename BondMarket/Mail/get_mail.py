@@ -1,7 +1,7 @@
 from time import sleep
 from app.app_state import AppState
 from log.log_file import Log_file
-import Mail.send_mail as send_mail
+import mail.send_mail as send_mail
 import imap_tools
 
 

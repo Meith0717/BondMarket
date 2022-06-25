@@ -10,10 +10,9 @@ def draw_menue_4(main_root, app_state: AppState):
     global root
 
     root = ctk.CTkFrame(
-        main_root, fg_color=ThemeManager.theme['color']['window_bg_color'])
-    title = ctk.CTkLabel(root, text='Help', text_font=('Segoe UI', 20))
-    title.pack(side='top', anchor='w', padx=5, pady=5)
-    root.pack(fill='both', padx=5, pady=5, ipady=500)
+        main_root,
+        fg_color=ThemeManager.theme['color']['window_bg_color'])
+    root.pack(padx=20, pady=20, fill='both', expand=True)
 
 
 def destroy_menue_4():

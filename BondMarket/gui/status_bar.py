@@ -8,10 +8,8 @@ def draw_status_bar(main_root: ctk.CTk) -> None:
     the copyright and the programming languages version
     location: pack(side='bottom', fill='x') 
     '''
-    root = ctk.CTkFrame(main_root,
-                        height=20,
-                        )
-    root.pack(side='bottom', fill='x', pady=4, padx=4)
+    root = ctk.CTkFrame(main_root, corner_radius=0, height=25)
+    root.pack(side='bottom', fill='x')
     ctk.CTkLabel(root,
                  text=f'Python {LANGUAGE_VERSION}  |  Copyright © 2022 {APP_AUTHOR}  |  Version:{APP_VERSION}',
                  width=80,

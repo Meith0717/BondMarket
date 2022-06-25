@@ -1,7 +1,9 @@
 """System module."""
 from typing import Any
+
+from matplotlib.pyplot import fill
 from app.app_state import AppState, ExpenditureStrukture
-from tkinter import messagebox
+from tkinter import font, messagebox
 from datetime import date as datetime
 from customtkinter.theme_manager import ThemeManager
 import customtkinter as ctk
@@ -53,7 +55,7 @@ def table_filter(main_root: ctk.CTk, app_state: AppState) -> None:
         update_table(app_state)
 
     root = ctk.CTkFrame(main_root)
-    root.pack(side='top', anchor='nw', fill='both',
+    root.pack(side='top', anchor='nw', fill='y',
               padx=PADX, pady=PADY, ipadx=IPADX,
               ipady=IPADY, expand=False)
 
@@ -161,7 +163,9 @@ def entrys(main_root, app_state: AppState) -> None:
             date (str)
         """
         app_state.remove_expenditure(person_name, float(amount), comment, date)
+        app_state.table_state.index = 0
         update_table(app_state)
+        e1.set('')
         e2.delete(0, 'end')
         e3.delete(0, 'end')
         e4.delete(0, 'end')
@@ -169,7 +173,7 @@ def entrys(main_root, app_state: AppState) -> None:
         app_state.save_state = False
 
     root = ctk.CTkFrame(main_root)
-    root.pack(side='top', anchor='nw', fill='both', padx=PADX,
+    root.pack(side='top', anchor='nw', fill='y', padx=PADX,
               pady=PADY, ipadx=IPADX, ipady=IPADY, expand=False)
 
     ctk.CTkLabel(root, text='Entrys         ', text_font=('Segoe UI', 20)
@@ -199,15 +203,15 @@ def entrys(main_root, app_state: AppState) -> None:
     ctk.CTkButton(root, text='Add',
                   command=lambda: add_to_table_array(
                       app_state, e1.get(), e2.get(), e3.get(), e4.get())
-                  ).grid(row=5, column=0, pady=5, padx=20)
+                  ).grid(row=5, column=0, pady=5, padx=20, sticky='w')
 
     ctk.CTkButton(root, text='Change'
-                  ).grid(row=6, column=0, pady=5, padx=20)
+                  ).grid(row=6, column=0, pady=5, padx=20, sticky='w')
 
     ctk.CTkButton(root, text='Delete',
                   command=lambda: remove_from_table_array(
                       app_state, e1.get(), e2.get(), e3.get(), e4.get())
-                  ).grid(row=7, column=0, pady=5, padx=20)
+                  ).grid(row=7, column=0, pady=5, padx=20, sticky='w')
 
 
 def changet_table_index(app_state: AppState, value: Any) -> None:
@@ -228,24 +232,17 @@ def update_table(app_state: AppState) -> None:
         app_state (AppState)
     """
     app_state.get_table_array()
-    n = len(app_state.table_state.table_array)-10
-    if n == 0:
-        slider.config(from_=100, command=None)
-    else:
-        slider.config(from_=n, number_of_steps=n,
-                      command=lambda value: changet_table_index(app_state, value))
     for i in range(10):
         try:
             expenditure: ExpenditureStrukture = app_state.table_state.table_array[
                 i+app_state.table_state.index]
-            name_lables[i].config(text=f"{expenditure.person_name}")
-            info_lables[i].config(text=f"{expenditure.comment}")
+            text_lables[i].config(text=f"{expenditure.person_name} {expenditure.comment}")
             date_lables[i].config(text=f"{expenditure.date}")
             if expenditure.amount == 0:
                 amount_lables[i].config(text="")
             else:
                 amount_lables[i].config(
-                    text=f"- {expenditure.amount} {app_state.settings['app_settings']['currency']}")
+                    text=f"{-expenditure.amount} {app_state.settings['app_settings']['currency']}")
         except IndexError:
             app_state.table_state.index -= 10
             update_table(app_state)
@@ -258,7 +255,17 @@ def table(main_root, app_state: AppState) -> None:
         main_root (_type_)
         app_state (AppState)
     """
-    global name_lables, info_lables, amount_lables, date_lables, slider
+    global text_lables, amount_lables, date_lables, slider
+
+    def mouse_wheel(event, app_state: AppState) -> None:
+        len_ = len(app_state.table_state.table_array)
+        if event.num == 5 or event.delta == -120:
+            if app_state.table_state.index < len_ - 10:
+                app_state.table_state.index += 1
+        if event.num == 4 or event.delta == 120:
+            if app_state.table_state.index > 0:
+                app_state.table_state.index -= 1
+        update_table(app_state)
 
     def get_row(index: int, app_state: AppState) -> None:
         """Returns the clipped row in the input fields
@@ -280,73 +287,48 @@ def table(main_root, app_state: AppState) -> None:
         except IndexError:
             pass
 
-    root = ctk.CTkFrame(main_root,  fg_color=None)
-    root.pack(side='left', anchor='nw', fill='both', padx=PADX,
+    root = ctk.CTkFrame(main_root, width=300)
+    root.pack(side='left', anchor='nw', fill='y', padx=PADX,
               pady=PADY, ipadx=IPADX, ipady=IPADY, expand=False)
-    
-    row_frames = [ctk.CTkFrame(
-        root, height=55, width=550) for i in range(10)]
-    
-    name_lables = [ctk.CTkLabel(row_frames[i], text_font=(
-        'San Francisco', 16), width=300) for i in range(10)]
-    
-    info_lables = [ctk.CTkLabel(row_frames[i], width=300) for i in range(10)]
-    
-    amount_lables = [ctk.CTkLabel(row_frames[i], text_font=(
-        'San Francisco', 18), width=300) for i in range(10)]
-    
-    date_lables = [ctk.CTkLabel(row_frames[i]) for i in range(10)]
-    
-    ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
-        0, app_state)).grid(row=0, column=0, padx=20, pady=5)
-    ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
-        1, app_state)).grid(row=1, column=0, padx=20, pady=5)
-    ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
-        2, app_state)).grid(row=2, column=0, padx=20, pady=5)
-    ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
-        3, app_state)).grid(row=3, column=0, padx=20, pady=5)
-    ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
-        4, app_state)).grid(row=4, column=0, padx=20, pady=5)
-    ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
-        5, app_state)).grid(row=5, column=0, padx=20, pady=5)
-    ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
-        6, app_state)).grid(row=6, column=0, padx=20, pady=5)
-    ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
-        7, app_state)).grid(row=7, column=0, padx=20, pady=5)
-    ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
-        8, app_state)).grid(row=8, column=0, padx=20, pady=5)
-    ctk.CTkButton(root, text='', width=20, height=20, command=lambda: get_row(
-        9, app_state)).grid(row=9, column=0, padx=20, pady=5)
-    
+    ctk.CTkLabel(root, text='Data Table',
+             text_font=('Segoe UI', 18),
+             width=650,
+             ).pack(side='top', padx=5, pady='5')
+    root.canvas.bind("<MouseWheel>", lambda e: mouse_wheel(e, app_state))
+    row_frames = [ctk.CTkFrame(root, border_width=2,
+                               fg_color=ThemeManager.theme['color']['frame_low']) for i in range(10)]
+    text_lables = [ctk.CTkLabel(row_frames[i]) for i in range(10)]
+    amount_lables = [ctk.CTkLabel(row_frames[i], text_color='red', width=50,
+                                  text_font=('San Francisco', 14)) for i in range(10)]
+    date_lables = [ctk.CTkLabel(row_frames[i], width=60) for i in range(10)]
     app_state.get_table_array()
     
     for i in range(10):
-        row_frames[i].grid(row=i, column=1, padx=5, pady=4)
+        row_frames[i].pack(side='top', padx=25, pady=6, fill='x')
+        row_frames[i].canvas.bind("<MouseWheel>", lambda e: mouse_wheel(e, app_state))
         expenditure: ExpenditureStrukture = app_state.table_state.table_array[i]
-        name_lables[i].config(text=f"{expenditure.person_name}")
-        name_lables[i].grid(row=0, column=0, padx=6, pady=6)
-        info_lables[i].config(text=f"{expenditure.comment}")
-        info_lables[i].grid(row=1, column=0, padx=6, pady=6)
+        
+        amount_lables[i].pack(side='top', anchor='nw', padx=12, pady=5)
+        amount_lables[i].config(text=f"{-expenditure.amount} {app_state.settings['app_settings']['currency']}")
+        
+        date_lables[i].pack(side='right', anchor='ne', padx=12, pady=5)
         date_lables[i].config(text=f"{expenditure.date}")
-        date_lables[i].grid(row=1, column=1, padx=6, pady=6)
-        amount_lables[i].grid(row=0, rowspan=3, column=2, padx=6, pady=5)
-        if expenditure.amount != 0:
-            amount_lables[i].config(text="")
-        else:
-            amount_lables[i].config(
-                text=f"- {expenditure.amount} {app_state.settings['app_settings']['currency']}")
-    array_len = len(app_state.table_state.table_array)-10
-    if array_len == 0:
-        slider = ctk.CTkSlider(root, from_=100, to=0,
-                               orient="vertical", height=750, button_color=FRAME_BG, )
-    else:
-        slider = ctk.CTkSlider(root, from_=array_len, to=0, 
-                               command=lambda value: changet_table_index(app_state,
-                                                                         value, button_color=FRAME_BG
-                                                                         ),
-                               orient="vertical", number_of_steps=array_len, height=750)
-    slider.set(0)
-    slider.grid(row=0, rowspan=9, column=2)
+        
+        text_lables[i].pack(side='left', anchor='sw', padx=12, pady=5)
+        text_lables[i].config(text=f"{expenditure.person_name} {expenditure.comment}")
+
+
+    row_frames[0].canvas.bind('<Button-1>', lambda e: get_row(0, app_state))
+    row_frames[1].canvas.bind('<Button-1>', lambda e: get_row(1, app_state))
+    row_frames[2].canvas.bind('<Button-1>', lambda e: get_row(2, app_state))
+    row_frames[3].canvas.bind('<Button-1>', lambda e: get_row(3, app_state))
+    row_frames[4].canvas.bind('<Button-1>', lambda e: get_row(4, app_state))
+    row_frames[5].canvas.bind('<Button-1>', lambda e: get_row(5, app_state))
+    row_frames[6].canvas.bind('<Button-1>', lambda e: get_row(6, app_state))
+    row_frames[7].canvas.bind('<Button-1>', lambda e: get_row(7, app_state))
+    row_frames[8].canvas.bind('<Button-1>', lambda e: get_row(8, app_state))
+    row_frames[9].canvas.bind('<Button-1>', lambda e: get_row(9, app_state))
+    row_frames[0].canvas.bind("<MouseWheel>", lambda e: mouse_wheel(e, app_state))
 
 
 def draw_info_frame(main_root, app_state: AppState) -> None:
@@ -357,7 +339,7 @@ def draw_info_frame(main_root, app_state: AppState) -> None:
         app_state (AppState)
     """
     root = ctk.CTkFrame(main_root, width=600, height=600)
-    root.pack(side='top', anchor='nw', fill='both', padx=PADX,
+    root.pack(side='top', anchor='nw', fill='y', padx=PADX,
               pady=PADY, ipadx=IPADX, ipady=IPADY, expand=False)
 
     ctk.CTkLabel(root, text='Info           ', text_font=('Segoe UI', 20)
@@ -374,14 +356,13 @@ def draw_menue_1(main_root: ctk.CTk, app_state: AppState) -> None:
     global root
 
     root = ctk.CTkFrame(
-        main_root, fg_color=ThemeManager.theme['color']['window_bg_color'])
-    title = ctk.CTkLabel(root, text='Expanses', text_font=('Segoe UI', 20))
-    title.pack(side='top', anchor='w', padx=5, pady=5)
+        main_root,
+        fg_color=ThemeManager.theme['color']['window_bg_color'])
     table(root, app_state)
     entrys(root, app_state)
     table_filter(root, app_state)
     draw_info_frame(root, app_state)
-    root.pack(padx=20, pady=10, ipady=500, fill='both', expand=True)
+    root.pack(padx=20, pady=20, fill='both', expand=True)
     root.canvas.bind('<Return>', lambda: print('pass'))
 
 

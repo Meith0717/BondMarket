@@ -1,11 +1,10 @@
 from datetime import datetime
 from time import sleep
-import Mail.get_mail as get_mail
+import mail.get_mail as get_mail
 from app.app_state import AppState, process_exists, create_all_dir
 from log.log_file import Log_file
 import threading
 import os
-
 
 MESSAGE = (
     'Mail Serviece is now running. Please do not use the app '
@@ -26,15 +25,17 @@ def mainloop():
     app_state = AppState()
     app_state.load_settings()
     log = Log_file()
-    log.initialize(application='MS')
     server = f"imap.{app_state.settings['main_service']['server']}"
     username = app_state.settings["main_service"]["user"]
     password = app_state.settings["main_service"]["psw"]
     if process_exists('BondMarket.exe'):
         print('Mail service cannot be used when BondMarket is running.')
         t.start()
-        sleep(120)
+        while t.is_alive():
+            pass
+        return
     print('Loading...')
+    log.initialize(application='MS')
     if get_mail.test_connection(server, username, password):
         os.system('cls' if os.name == 'nt' else 'clear')
         print(MESSAGE)
