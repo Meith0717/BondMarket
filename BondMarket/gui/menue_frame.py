@@ -1,3 +1,4 @@
+import tkinter
 import customtkinter as ctk
 import gui.menues.debts_menue as debts_menue
 import gui.menues.expenses_menue as expenses_menue
@@ -72,7 +73,7 @@ def save(app_state: AppState) -> None:
     app_state.save_array()
 
 
-def draw_menue(main_root, app_state: AppState) -> None:
+def draw_menue(main_root: ctk.CTk, app_state: AppState) -> None:
     '''Creates the main menu of the app 
     Location: pack(side='left', fill='y', padx=0, pady=0)
     '''
@@ -89,6 +90,9 @@ def draw_menue(main_root, app_state: AppState) -> None:
     text_color = ThemeManager.theme['color']['text']
     text_font = ('Segoe UI', 15)
     # Create Menue Buttons
+    
+    main_root.bind('<Control-s>', lambda _: save(app_state))
+    
     ctk.CTkButton(root,
                   image=logo,
                   state='disabled',
@@ -150,7 +154,8 @@ def draw_menue(main_root, app_state: AppState) -> None:
                                 command=lambda: save(app_state))
     PDF_button = ctk.CTkButton(root,
                                text='PDF',
-                               width=10)
+                               width=10,
+                               state=tkinter.DISABLED)
     menue_1_button.pack(side='top', padx=5, pady=40, anchor='w')
     menue_2_button.pack(side='top', padx=5, pady=40, anchor='w')
     menue_3_button.pack(side='top', padx=5, pady=40, anchor='w')

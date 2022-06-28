@@ -6,16 +6,24 @@ import json
 import pickle
 import subprocess
 
-APP_VERSION = '_beta_'
+APP_VERSION = 'b.5.0.1'
 APP_AUTHOR = 'Thierry Meiers'
 LANGUAGE_VERSION = 3.10
 
 DOC_PATH = os.path.expanduser('~\\Documents')
 APP_DIR_PATH = f"{DOC_PATH}\\BondMarket {APP_VERSION}"
-DATA_DIR_PATH = f"{APP_DIR_PATH}\\Data"
+DATA_DIR_PATH = f"{APP_DIR_PATH}\\BondMarket Data"
 SETTINGS_DIR_PATH = f"{APP_DIR_PATH}\\Settings"
-APP_LOG_DIR_PATH = f"{APP_DIR_PATH}\\App Log"
+APP_LOG_DIR_PATH = f"{APP_DIR_PATH}\\BondMarket Log"
 MS_LOG_DIR_PATH = f"{APP_DIR_PATH}\\Mail Service Log"
+BACKUP_DIR_PATH = f"{APP_DIR_PATH}\\BondMarket Backup"
+DIRECTORIES = [APP_DIR_PATH,
+         DATA_DIR_PATH,
+         SETTINGS_DIR_PATH,
+         APP_LOG_DIR_PATH,
+         MS_LOG_DIR_PATH,
+         BACKUP_DIR_PATH]
+
 SETTINGS = {
     "app_settings":
     { 
@@ -114,17 +122,10 @@ class DebtsState:
 def create_all_dir() -> None:
     """Creates all needed folders
     """
-    if not os.path.isdir(APP_DIR_PATH):
-        os.mkdir(APP_DIR_PATH)
-    if not os.path.isdir(DATA_DIR_PATH):
-        os.mkdir(DATA_DIR_PATH)
-    if not os.path.isdir(SETTINGS_DIR_PATH):
-        os.mkdir(SETTINGS_DIR_PATH)
-    if not os.path.isdir(APP_LOG_DIR_PATH):
-        os.mkdir(APP_LOG_DIR_PATH)
-    if not os.path.isdir(MS_LOG_DIR_PATH):
-        os.mkdir(MS_LOG_DIR_PATH)
-
+    for dir in DIRECTORIES:
+        if not os.path.isdir(dir):
+            os.mkdir(dir)
+    
 
 @dataclass
 class AppState:
@@ -168,6 +169,8 @@ class AppState:
                 self.data_array = pickle.load(file)
         except FileNotFoundError:
             pass
+        except TypeError:
+            print('Filepath: None')
 
     def save_array(self) -> None:
         """Saves the data to the file data.pkl.

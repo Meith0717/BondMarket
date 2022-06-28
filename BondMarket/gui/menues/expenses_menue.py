@@ -1,14 +1,16 @@
 """System module."""
+import tkinter
 from typing import Any
 
 from matplotlib.pyplot import fill
 from app.app_state import AppState, ExpenditureStrukture
-from tkinter import font, messagebox
+import messagebox.messagebox as msg
 from datetime import date as datetime
 from customtkinter.theme_manager import ThemeManager
 import customtkinter as ctk
 
 PADX = PADY = IPADX = IPADY = 10
+LABLE_TITLE_FONT = ('San Francisco', 20)
 FRAME_BG = ThemeManager.theme['color']['frame_low']
 YEARS = [str(2000+x) for x in range(22, 30)]
 MONTHS = ['01', '02', '03', '04', '05', '06',
@@ -58,9 +60,9 @@ def table_filter(main_root: ctk.CTk, app_state: AppState) -> None:
     root.pack(side='top', anchor='nw', fill='y',
               padx=PADX, pady=PADY, ipadx=IPADX,
               ipady=IPADY, expand=False)
-
-    ctk.CTkLabel(root, text='Filter', text_font=('Segoe UI', 20)
+    ctk.CTkLabel(root, text='Filter      ', text_font=LABLE_TITLE_FONT
                  ).grid(row=0, column=0, pady=5, padx=20, sticky='w')
+
     ctk.CTkLabel(root, text='Month:'
                  ).grid(row=1, column=0, pady=5, padx=20, sticky='e')
     ctk.CTkLabel(root, text='Year:'
@@ -81,7 +83,7 @@ def table_filter(main_root: ctk.CTk, app_state: AppState) -> None:
     e3 = ctk.CTkEntry(root, width=200)
     e3.grid(row=3, column=1, pady=5, sticky='w', padx=20)
 
-    ctk.CTkButton(root, text='Search').grid(row=4, pady=5, padx=20)
+    ctk.CTkButton(root, text='Search', state=tkinter.DISABLED).grid(row=4, pady=5, padx=20)
 
     ctk.CTkLabel(root, text='Sort', text_font=('Segoe UI', 15),
                  width=100).grid(row=5, column=0, padx=20, pady=5)
@@ -131,25 +133,21 @@ def entrys(main_root, app_state: AppState) -> None:
             date (str)
         """
         if person_name != '' and amount != '' and comment != '':
-            if person_name == '':
-                messagebox.showerror('BondMarket', 'Please enter a name')
-            elif amount == '':
-                messagebox.showerror('BondMarket', 'Please enter an amount')
-            elif date == '':
-                messagebox.showerror('BondMarket', 'Please enter a date')
-            else:
-                app_state.append_expenditure(
-                    person_name, float(amount), comment, date)
-                update_table(app_state)
-                e1.set('')
-                e2.delete(0, 'end')
-                e3.delete(0, 'end')
-                e4.delete(0, 'end')
-                e4.insert(0, datetime.today().strftime('%Y.%m.%d'))
-                app_state.save_state = False
-            if app_state.check_names() is False:
-                messagebox.showwarning(
-                    'BondMarket', 'A user was detected in the table which was not registered ')
+            app_state.append_expenditure(
+                person_name, float(amount), comment, date)
+            update_table(app_state)
+            e1.set('')
+            e2.delete(0, 'end')
+            e3.delete(0, 'end')
+            e4.delete(0, 'end')
+            e4.insert(0, datetime.today().strftime('%Y.%m.%d'))
+            app_state.save_state = False
+        else:
+            msg.enter_all()
+    
+        if app_state.check_names() is False:
+            msg.user_detected()
+        
 
     def remove_from_table_array(app_state: AppState, person_name: str,
                                 amount: float, comment: str, date: str) -> None:
@@ -162,22 +160,25 @@ def entrys(main_root, app_state: AppState) -> None:
             comment (str)
             date (str)
         """
-        app_state.remove_expenditure(person_name, float(amount), comment, date)
-        app_state.table_state.index = 0
-        update_table(app_state)
-        e1.set('')
-        e2.delete(0, 'end')
-        e3.delete(0, 'end')
-        e4.delete(0, 'end')
-        e4.insert(0, datetime.today().strftime('%Y.%m.%d'))
-        app_state.save_state = False
+        if person_name != '' and amount != '' and comment != '':
+            app_state.remove_expenditure(person_name, float(amount), comment, date)
+            app_state.table_state.index = 0
+            update_table(app_state)
+            e1.set('')
+            e2.delete(0, 'end')
+            e3.delete(0, 'end')
+            e4.delete(0, 'end')
+            e4.insert(0, datetime.today().strftime('%Y.%m.%d'))
+            app_state.save_state = False
+        else:
+            msg.enter_all()
 
     root = ctk.CTkFrame(main_root)
     root.pack(side='top', anchor='nw', fill='y', padx=PADX,
               pady=PADY, ipadx=IPADX, ipady=IPADY, expand=False)
-
-    ctk.CTkLabel(root, text='Entrys         ', text_font=('Segoe UI', 20)
+    ctk.CTkLabel(root, text='Entrys         ', text_font=LABLE_TITLE_FONT
                  ).grid(row=0, column=0, pady=5, padx=20, sticky='w')
+
     ctk.CTkLabel(root, text='   Person Name:'
                  ).grid(row=1, column=0, pady=5, padx=20, sticky='e')
     ctk.CTkLabel(root, text='        Amount:'
@@ -205,7 +206,7 @@ def entrys(main_root, app_state: AppState) -> None:
                       app_state, e1.get(), e2.get(), e3.get(), e4.get())
                   ).grid(row=5, column=0, pady=5, padx=20, sticky='w')
 
-    ctk.CTkButton(root, text='Change'
+    ctk.CTkButton(root, text='Change', state=tkinter.DISABLED
                   ).grid(row=6, column=0, pady=5, padx=20, sticky='w')
 
     ctk.CTkButton(root, text='Delete',
@@ -274,9 +275,9 @@ def table(main_root, app_state: AppState) -> None:
             index (int): _description_
             app_state (AppState): _description_
         """
-        try:
-            expenditure: ExpenditureStrukture = app_state.table_state.table_array[
-                app_state.table_state.index+index]
+        expenditure: ExpenditureStrukture = app_state.table_state.table_array[
+            app_state.table_state.index+index]
+        if expenditure.date != '':
             e2.delete(0, 'end')
             e3.delete(0, 'end')
             e4.delete(0, 'end')
@@ -284,16 +285,12 @@ def table(main_root, app_state: AppState) -> None:
             e2.insert(0, expenditure.amount)
             e3.insert(0, expenditure.comment)
             e4.insert(0, expenditure.date)
-        except IndexError:
-            pass
 
     root = ctk.CTkFrame(main_root, width=300)
-    root.pack(side='left', anchor='nw', fill='y', padx=PADX,
+    root.pack(side='left', anchor='nw', padx=PADX,
               pady=PADY, ipadx=IPADX, ipady=IPADY, expand=False)
-    ctk.CTkLabel(root, text='Data Table',
-             text_font=('Segoe UI', 18),
-             width=650,
-             ).pack(side='top', padx=5, pady='5')
+    ctk.CTkLabel(root, text='', width=550, height=5
+                 ).pack(side='top')
     root.canvas.bind("<MouseWheel>", lambda e: mouse_wheel(e, app_state))
     row_frames = [ctk.CTkFrame(root, border_width=2,
                                fg_color=ThemeManager.theme['color']['frame_low']) for i in range(10)]
@@ -304,7 +301,7 @@ def table(main_root, app_state: AppState) -> None:
     app_state.get_table_array()
     
     for i in range(10):
-        row_frames[i].pack(side='top', padx=25, pady=6, fill='x')
+        row_frames[i].pack(side='top', padx=25, pady=7, fill='x')
         row_frames[i].canvas.bind("<MouseWheel>", lambda e: mouse_wheel(e, app_state))
         expenditure: ExpenditureStrukture = app_state.table_state.table_array[i]
         
@@ -361,10 +358,7 @@ def draw_menue_1(main_root: ctk.CTk, app_state: AppState) -> None:
     table(root, app_state)
     entrys(root, app_state)
     table_filter(root, app_state)
-    draw_info_frame(root, app_state)
     root.pack(padx=20, pady=20, fill='both', expand=True)
-    root.canvas.bind('<Return>', lambda: print('pass'))
-
 
 def destroy_menue_1() -> None:
     """_summary_

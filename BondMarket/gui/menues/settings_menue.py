@@ -1,4 +1,6 @@
-from tkinter import messagebox
+from tkinter import filedialog
+import messagebox.messagebox as msg
+import tkinter
 import customtkinter as ctk
 from customtkinter.theme_manager import ThemeManager
 from customtkinter import appearance_mode_tracker
@@ -22,7 +24,26 @@ def author_frame(main_root: ctk.CTk) -> None:
     
     
 def file_settings(main_root: ctk.CTk, app_state: AppState) -> None:
+    
+    def open_file(app_state: AppState) -> None:
+        old_path: str = app_state.settings['app_settings']['file_path']
+        path: str = filedialog.askopenfilename(title='BondMarket', filetypes=[('Pickle', '*.pkl')])
+        if app_state.save_state is False:
+            app_state.save_array() if msg.want_to_save(app_state.settings['app_settings']['file_path']) else None
+        app_state.settings['app_settings']['file_path'] = path if path != '' else old_path
+        app_state.load_array()
 
+    def new_file() -> None:
+        old_path: str = app_state.settings['app_settings']['file_path']
+        path: str = filedialog.asksaveasfilename(title='BondMarket', filetypes=[('Pickle', '*.pkl')])
+        if app_state.save_state is False:
+            app_state.save_array() if msg.want_to_save(app_state.settings['app_settings']['file_path']) else None
+        app_state.settings['app_settings']['file_path'] = path if path != '' else old_path
+
+        app_state.data_array=[]
+        app_state.save_array()
+
+    
     root = ctk.CTkFrame(main_root)
     root.pack(side='top', padx=10, pady=10, fill='x')
 
@@ -31,13 +52,13 @@ def file_settings(main_root: ctk.CTk, app_state: AppState) -> None:
                  width=100
                  ).grid(row=0, column=0, padx=5, pady=5)
 
-    ctk.CTkButton(root, text='Open File').grid(
+    ctk.CTkButton(root, text='Open File', command=lambda: open_file(app_state)).grid(
         row=1, column=0, pady=10, padx=10, sticky='w')
-    ctk.CTkButton(root, text='New File').grid(
+    ctk.CTkButton(root, text='New File', command=new_file).grid(
         row=1, column=1, pady=10, padx=10, sticky='w')
-    ctk.CTkButton(root, text='Create Backup').grid(
+    ctk.CTkButton(root, text='Create Backup', state=tkinter.DISABLED).grid(
         row=2, column=0, pady=10, padx=10, sticky='w')
-    ctk.CTkButton(root, text='Restore Backup').grid(
+    ctk.CTkButton(root, text='Restore Backup', state=tkinter.DISABLED).grid(
         row=2, column=1, pady=10, padx=10, sticky='w')
 
 
@@ -110,28 +131,28 @@ def user_settings(main_root: ctk.CTk, app_state: AppState) -> None:
     def add_user(app_state: AppState):
         name = e1.get()
         if name == '':
-            messagebox.showerror('BondMarket', 'Please enter Name')
+            msg.enter_name()
             return
         if name not in app_state.settings['app_settings']['persons_mames'].keys():
             app_state.settings['app_settings']['persons_mames'][name] = ''
-            messagebox.showinfo('BondMarket', f'{name} was added.')
+            msg.was_added(name)
             e1.config(values=list(app_state.settings['app_settings']['persons_mames'].keys()))
             e1.set('')
         elif name in app_state.settings['app_settings']['persons_mames'].keys():
-            messagebox.showerror('BondMarket', 'Name already registered!')
+            msg.name_exist()
     
     def remove_user(app_state: AppState):
         name = e1.get()
         if name == '':
-            messagebox.showerror('BondMarket', 'Please enter Name')
+            msg.enter_name()
         if name in app_state.settings['app_settings']['persons_mames']:
             del app_state.settings['app_settings']['persons_mames'][name]
-            messagebox.showinfo('BondMarket', f'{name} has been removed!')
+            msg.was_removed(name)
             e1.config(values=list(app_state.settings['app_settings']['persons_mames'].keys()))
             e1.set('')
         else:
-            messagebox.showerror('BondMarket', 'User doesent exist!')
-    
+            msg.name_does_not_exist()
+            
     root = ctk.CTkFrame(main_root)
     root.pack(side='top', padx=10, pady=10, fill='x')
     
@@ -162,18 +183,17 @@ def mail_user_settings(main_root: ctk.CTk, app_state: AppState) -> None:
     def add_user(app_state: AppState):
         mail = e1.get()
         if mail == '':
-            messagebox.showerror('BondMarket', 'Please enter Mail-adress')
             return
         if mail not in app_state.settings['app_settings']['persons_mames'].values():
             if send_mail.login_mail(mail, 'User', app_state):
-                messagebox.showinfo('BondMarket', f'Mail has been send to {mail}')
+                msg.send_mail(mail)
                 e1.delete(0, 'end')
             else:
-                messagebox.showinfo('BondMarket', 'Invalid email address, error!') 
+                msg.invalide_mail()
         elif mail in app_state.settings['app_settings']['persons_mames'].values():
-            messagebox.showerror('BondMarket', 'Email address already bound to one person!')
+            msg.mail_exist()
         else:
-            messagebox.showinfo('BondMarket', 'Unnown Error!') 
+            msg.unknown_error() 
             
     root = ctk.CTkFrame(main_root)
     root.pack(side='top', padx=10, pady=10, fill='x')

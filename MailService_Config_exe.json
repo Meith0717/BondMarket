@@ -11,15 +11,19 @@
   },
   {
    "optionDest": "onefile",
-   "value": true
+   "value": false
   },
   {
    "optionDest": "console",
    "value": true
   },
   {
+   "optionDest": "icon_file",
+   "value": "D:/Documents/Git/BondMarket/Icons/BondMarket_Icon.ico"
+  },
+  {
    "optionDest": "name",
-   "value": "Mail Service"
+   "value": "BondMarket Mail Service"
   },
   {
    "optionDest": "ascii",
@@ -68,6 +72,22 @@
   {
    "optionDest": "argv_emulation",
    "value": false
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/Thierry/AppData/Local/Programs/Python/Python310/Lib/site-packages/customtkinter;customtkinter/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Documents/Git/BondMarket/Icons;Icons/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Documents/Git/BondMarket/Settings;Settings/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Documents/Git/BondMarket/Themes;Themes/"
   }
  ],
  "nonPyinstallerOptions": {
