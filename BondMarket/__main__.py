@@ -38,14 +38,14 @@ def mainloop() -> None:
     app_state.load_settings()
     ctk.set_appearance_mode(app_state.settings["app_settings"]["appearance"])
     app_state.load_array()
-    ctk.set_default_color_theme(r'Themes\theme.json')
+    ctk.set_default_color_theme(r'themes\theme.json')
     main_root = ctk.CTk()
     # Custom up main Window
     main_root.geometry(
         f"{main_root.winfo_screenwidth()}x{main_root.winfo_screenheight()}")
     main_root.state('zoomed')
     main_root.title('')
-    main_root.iconbitmap(r'Icons\BondMarket_Icon.ico')
+    main_root.iconbitmap(r'icons\BondMarket_Icon.ico')
     main_root.protocol('WM_DELETE_WINDOW', lambda: exit(app_state))
     status_bar.draw_status_bar(main_root)
     menue_frame.draw_menue(main_root, app_state)
