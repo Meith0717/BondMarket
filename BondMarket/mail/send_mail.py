@@ -25,52 +25,12 @@ Add new data:
 -add quantity,location (use a dot for floating point numbers! e.g.: 10.55)
 
 Do you need help:
--help
+-help (not yet available)
 
 Commandos are written to the subjects, text is ignored!
 
 Best regards,
 BondMarket Mail Service 
-_________________________________________
-
-Hallo {name}
-
-Ich bin der Maildienst der App BondMarket. Mit meiner Hilfe kannst du ganz einfach
-Käufe von überall aus eingeben. Ich bestätige hiermit, dass deine Mail nicht
-in Zukunft nicht mehr ignoriert wird!
-
-__Liste der Befehle__
-
-Neue Daten hinzufügen:
--Menge,Ort hinzufügen (bei Fließkommazahlen einen Punkt verwenden! z.B.: 10.55)
-
-Benötigen Sie Hilfe?
--help
-
-Befehle werden in die Fächer geschrieben, Text wird ignoriert!
-
-Mit freundlichen Grüßen,
-BondMarket Mail Dienst 
-_________________________________________
-
-Salut {name}
-
-Je suis le service de messagerie de l'application BondMarket. Avec mon aide, vous pouvez facilement\
-saisir des achats de n'importe où. Je confirme par la présente que votre courrier ne sera pas\
-ignoré à l'avenir !
-
-__Liste des commandes__
-
-Ajouter de nouvelles données :
--add quantity,location (utilisez un point pour les nombres à virgule flottante ! ex. : 10.55)
-
-Avez-vous besoin d'aide ?
--help
-
-Les commandes sont écrites dans les sujets, le texte est ignoré !
-
-Meilleures salutations,
-Service courrier de BondMarket 
 """
     
     msg = EmailMessage()
@@ -131,7 +91,7 @@ Hey {name},
 
 Please confirm your identity by simply returning this email.
 
-Please check that the subject: BondMarket: login Your Name is written in the return.
+Please check that the subject: "-login Your Name" is written in the return.
 
 
 Kind regards,
@@ -142,7 +102,7 @@ BondMarket Mail Service
     
     msg = EmailMessage()
     msg.set_content(message)
-    msg['Subject'] = f'BondMarket: login {name}'
+    msg['Subject'] = f'-login {name}'
     msg['From'] = f"{username}@{server}"
     msg['To'] = receiver
 

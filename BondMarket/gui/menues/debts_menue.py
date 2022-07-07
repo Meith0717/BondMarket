@@ -14,7 +14,7 @@ LABLE_TITLE_FONT = ('San Francisco', 20)
 def debts(main_root: ctk.CTk, app_state: AppState) -> None:
     currency = app_state.settings['app_settings']['currency']
     root = ctk.CTkFrame(main_root)
-    root.grid(row=0, column=1, padx=PADX,
+    root.grid(row=0, column=1, sticky='n', padx=PADX,
               pady=PADY, ipadx=IPADX, ipady=IPADY)
     ctk.CTkLabel(root, text='Debts         ',
                  text_font=LABLE_TITLE_FONT

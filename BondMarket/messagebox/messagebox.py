@@ -57,3 +57,8 @@ def enter_all():
 def user_detected():
     return messagebox.showwarning(TITLE,
                                   'A user was detected in the table which was not registered ')
+
+def pdf_saved(path):
+    return messagebox.showinfo(TITLE,
+                               f'Pdf has been created in {path}/BondMarket Data.pdf')
+

@@ -56,7 +56,7 @@ def file_settings(main_root: ctk.CTk, app_state: AppState) -> None:
         row=1, column=0, pady=10, padx=10, sticky='w')
     ctk.CTkButton(root, text='New File', command=new_file).grid(
         row=1, column=1, pady=10, padx=10, sticky='w')
-    ctk.CTkButton(root, text='Create Backup', state=tkinter.DISABLED).grid(
+    ctk.CTkButton(root, text='Create Backup', command=lambda: app_state.save_backup()).grid(
         row=2, column=0, pady=10, padx=10, sticky='w')
     ctk.CTkButton(root, text='Restore Backup', state=tkinter.DISABLED).grid(
         row=2, column=1, pady=10, padx=10, sticky='w')
@@ -111,7 +111,7 @@ def currency_settings(main_root: ctk.CTk, app_state: AppState) -> None:
                  text_font=('Segoe UI', 15)
                  ).pack(side='top', anchor='w', padx=5, pady=5)
     
-    e1 = ctk.CTkComboBox(root, values=['\u20ac', '\uFF04', '\u00A3', '\u00A5'], command=lambda value: change_currency(value, app_state))
+    e1 = ctk.CTkComboBox(root, values=['\u20ac', '\u0024', '\u00A3', '\u00A5'], command=lambda value: change_currency(value, app_state))
     e1.pack(side='top', anchor='w', padx=10, pady=10)
     e1.set(app_state.settings["app_settings"]["currency"])
 
@@ -175,6 +175,9 @@ def user_settings(main_root: ctk.CTk, app_state: AppState) -> None:
                   command=lambda : remove_user(app_state)
                   ).grid(row=2, column=1, padx=10, pady=10)
     
+    ctk.CTkLabel(root, text='Add a new user without email, the email can be entered\nlater under the setting Mail Service -> User.'
+                 ).grid(row=3, column=0, columns=2, padx=5, pady=5)
+    
 #### Mail Service Settings ####
 
 
@@ -206,6 +209,9 @@ def mail_user_settings(main_root: ctk.CTk, app_state: AppState) -> None:
     e1 = ctk.CTkEntry(root, width=200)
     e1.grid(row=1, column=1, padx=10, pady=10)
     ctk.CTkButton(root, text='Add', command=lambda: add_user(app_state)).grid(row=2, column=0, padx=10, pady=10)
+    
+    ctk.CTkLabel(root, text='Send a confirmation mail to a user or not user.\nFor this an email account must be given below.'
+                 ).grid(row=3, column=0, columns=2, padx=5, pady=5)
     
 
 def mail_service_settings(main_root: ctk.CTk, app_state: AppState) -> None:
@@ -245,12 +251,22 @@ def mail_service_settings(main_root: ctk.CTk, app_state: AppState) -> None:
     e2.grid(row=2, column=1, pady=5, padx=10)
     e3.grid(row=3, column=1, pady=5, padx=10)
     
-    e1.insert(0, app_state.settings["main_service"]["server"])
+    if app_state.settings["main_service"]["server"] != '':
+        e1.insert(0, app_state.settings["main_service"]["server"])
+    else:
+        e1.insert(0, 'gmail.com')
     e2.insert(0, app_state.settings["main_service"]["user"])
     e3.insert(0, app_state.settings["main_service"]["psw"])
 
     b1 = ctk.CTkButton(root, text='Check Connection', command=lambda: check_conection())
     b1.grid(row=4, column=1, pady=5, padx=10)
+    
+    s = '''Do not enter your personal email account.
+Please create an email only for this app.
+(The mailbox will be deleted regularly)
+Gmail is best choice'''
+    ctk.CTkLabel(root, text=s
+                 ).grid(row=5, column=0, columns=2, padx=5, pady=5)
     
     
 def main_service_notes(main_root: ctk.CTk) -> None:

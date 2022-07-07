@@ -1,8 +1,5 @@
 """System module."""
-import tkinter
 from typing import Any
-
-from matplotlib.pyplot import fill
 from app.app_state import AppState, ExpenditureStrukture
 import messagebox.messagebox as msg
 from datetime import date as datetime
@@ -67,8 +64,6 @@ def table_filter(main_root: ctk.CTk, app_state: AppState) -> None:
                  ).grid(row=1, column=0, pady=5, padx=20, sticky='e')
     ctk.CTkLabel(root, text='Year:'
                  ).grid(row=2, column=0, pady=5, padx=20, sticky='e')
-    ctk.CTkLabel(root, text='Comment Key:'
-                 ).grid(row=3, column=0, pady=5, padx=20, sticky='e')
 
     e1 = ctk.CTkComboBox(root, width=200, values=MONTHS,
                          command=lambda value: set_month(value, app_state))
@@ -79,11 +74,6 @@ def table_filter(main_root: ctk.CTk, app_state: AppState) -> None:
                          command=lambda value: set_year(value, app_state))
     e2.set(app_state.table_state.year_filter)
     e2.grid(row=2, column=1, pady=5, sticky='w', padx=20)
-
-    e3 = ctk.CTkEntry(root, width=200)
-    e3.grid(row=3, column=1, pady=5, sticky='w', padx=20)
-
-    ctk.CTkButton(root, text='Search', state=tkinter.DISABLED).grid(row=4, pady=5, padx=20)
 
     ctk.CTkLabel(root, text='Sort', text_font=('Segoe UI', 15),
                  width=100).grid(row=5, column=0, padx=20, pady=5)
@@ -173,6 +163,10 @@ def entrys(main_root, app_state: AppState) -> None:
         else:
             msg.enter_all()
 
+
+    def change_entry_table_array():
+        pass
+
     root = ctk.CTkFrame(main_root)
     root.pack(side='top', anchor='nw', fill='y', padx=PADX,
               pady=PADY, ipadx=IPADX, ipady=IPADY, expand=False)
@@ -205,9 +199,6 @@ def entrys(main_root, app_state: AppState) -> None:
                   command=lambda: add_to_table_array(
                       app_state, e1.get(), e2.get(), e3.get(), e4.get())
                   ).grid(row=5, column=0, pady=5, padx=20, sticky='w')
-
-    ctk.CTkButton(root, text='Change', state=tkinter.DISABLED
-                  ).grid(row=6, column=0, pady=5, padx=20, sticky='w')
 
     ctk.CTkButton(root, text='Delete',
                   command=lambda: remove_from_table_array(
@@ -359,6 +350,7 @@ def draw_menue_1(main_root: ctk.CTk, app_state: AppState) -> None:
     entrys(root, app_state)
     table_filter(root, app_state)
     root.pack(padx=20, pady=20, fill='both', expand=True)
+
 
 def destroy_menue_1() -> None:
     """_summary_

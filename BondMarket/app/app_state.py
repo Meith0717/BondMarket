@@ -6,7 +6,7 @@ import json
 import pickle
 import subprocess
 
-APP_VERSION = 'b.5.0.1'
+APP_VERSION = 'ß.5.0.2'
 APP_AUTHOR = 'Thierry Meiers'
 LANGUAGE_VERSION = 3.10
 
@@ -151,9 +151,6 @@ class AppState:
     def save_settings(self) -> None:
         """Saves the data to the file settings.json.
         """
-        if not os.path.isdir('Settings'):
-
-            os.mkdir('Settings')
         with open(f"{SETTINGS_DIR_PATH}\\settings.json", "w",
                   encoding="UTF-8") as file:
 
@@ -176,6 +173,12 @@ class AppState:
         """Saves the data to the file data.pkl.
         """
         with open(self.settings['app_settings']['file_path'], "wb",
+                  encoding=None) as file:
+
+            pickle.dump(self.data_array, file)
+
+    def save_backup(self) -> None:
+        with open(f"{BACKUP_DIR_PATH}\\{datetime.today().strftime('%Y.%m.%d_%H.%M.%S')}_data.pkl", "wb",
                   encoding=None) as file:
 
             pickle.dump(self.data_array, file)

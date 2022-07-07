@@ -6,7 +6,6 @@ import messagebox.messagebox as msg
 import threading
 
 
-
 def check_if_ms_is_running(app_state: AppState) -> None:
     """This function checks if the mail service is running
 
@@ -50,6 +49,9 @@ def mainloop() -> None:
     status_bar.draw_status_bar(main_root)
     menue_frame.draw_menue(main_root, app_state)
     t.start()
+    main_root.lift()
+    main_root.attributes('-topmost',True)
+    main_root.after_idle(main_root.attributes,'-topmost',False)
     main_root.mainloop()
 
 

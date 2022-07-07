@@ -49,9 +49,12 @@ def connect(app_state: AppState, log: Log_file):
     username = app_state.settings["main_service"]["user"]
     password = app_state.settings["main_service"]["psw"]
     if test_connection(server, username, password):
-        with imap_tools.MailBox(server).login(username, password) as mailbox:
-            for msg in mailbox.fetch():
-                get_commands(app_state, msg, log)
-                mailbox.delete(msg.uid)
+        try:
+            with imap_tools.MailBox(server).login(username, password) as mailbox:
+                for msg in mailbox.fetch():
+                    get_commands(app_state, msg, log)
+                    mailbox.delete(msg.uid)
+        except Exception as e:
+            log.print_('root', f'{e}')
     else:
         sleep(5)

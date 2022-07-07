@@ -4,6 +4,7 @@ import gui.menues.debts_menue as debts_menue
 import gui.menues.expenses_menue as expenses_menue
 import gui.menues.help_menue as help_menue
 import gui.menues.settings_menue as settings_menue
+import pdf.pdf as pdf
 from tkinter import PhotoImage
 from customtkinter.theme_manager import ThemeManager
 from app.app_state import AppState
@@ -19,7 +20,7 @@ def show_menue_1(main_root, app_state: AppState) -> None:
     menue_1_button.config(state=DISABLED)
     menue_2_button.config(state=NORMAL)
     menue_3_button.config(state=NORMAL)
-    menue_4_button.config(state=NORMAL)
+    #menue_4_button.config(state=NORMAL)
     expenses_menue.draw_menue_1(main_root, app_state)
     debts_menue.destroy_menue_2()
     settings_menue.destroy_menue_3()
@@ -33,7 +34,7 @@ def show_menue_2(main_root, app_state: AppState) -> None:
     menue_1_button.config(state=NORMAL)
     menue_2_button.config(state=DISABLED)
     menue_3_button.config(state=NORMAL)
-    menue_4_button.config(state=NORMAL)
+    #menue_4_button.config(state=NORMAL)
     expenses_menue.destroy_menue_1()
     debts_menue.draw_menue_2(main_root, app_state)
     settings_menue.destroy_menue_3()
@@ -47,7 +48,7 @@ def show_menue_3(main_root, app_state: AppState) -> None:
     menue_1_button.config(state=NORMAL)
     menue_2_button.config(state=NORMAL)
     menue_3_button.config(state=DISABLED)
-    menue_4_button.config(state=NORMAL)
+    #menue_4_button.config(state=NORMAL)
     expenses_menue.destroy_menue_1()
     debts_menue.destroy_menue_2()
     settings_menue.draw_menue_3(main_root, app_state)
@@ -146,7 +147,8 @@ def draw_menue(main_root: ctk.CTk, app_state: AppState) -> None:
                                    fg_color=None,
                                    hover_color=None,
                                    text_font=text_font,
-                                   border_width=0
+                                   border_width=0,
+                                   state=tkinter.DISABLED
                                    )
     save_button = ctk.CTkButton(root,
                                 text='Save',
@@ -155,7 +157,7 @@ def draw_menue(main_root: ctk.CTk, app_state: AppState) -> None:
     PDF_button = ctk.CTkButton(root,
                                text='PDF',
                                width=10,
-                               state=tkinter.DISABLED)
+                               command=lambda: pdf.export(app_state))
     menue_1_button.pack(side='top', padx=5, pady=40, anchor='w')
     menue_2_button.pack(side='top', padx=5, pady=40, anchor='w')
     menue_3_button.pack(side='top', padx=5, pady=40, anchor='w')
