@@ -1,8 +1,8 @@
+from time import sleep
 import tkinter
 import customtkinter as ctk
 import gui.menues.debts_menue as debts_menue
 import gui.menues.expenses_menue as expenses_menue
-import gui.menues.help_menue as help_menue
 import gui.menues.settings_menue as settings_menue
 import pdf.pdf as pdf
 from tkinter import PhotoImage
@@ -17,56 +17,36 @@ def show_menue_1(main_root, app_state: AppState) -> None:
     '''Shows menu 1 and destroys
     all other menus
     '''
-    menue_1_button.config(state=DISABLED)
-    menue_2_button.config(state=NORMAL)
-    menue_3_button.config(state=NORMAL)
-    #menue_4_button.config(state=NORMAL)
+    menue_1_button.configure(state=DISABLED)
+    menue_2_button.configure(state=NORMAL)
+    menue_3_button.configure(state=NORMAL)
     expenses_menue.draw_menue_1(main_root, app_state)
     debts_menue.destroy_menue_2()
     settings_menue.destroy_menue_3()
-    help_menue.destroy_menue_4()
 
 
 def show_menue_2(main_root, app_state: AppState) -> None:
     '''Shows menu 2 and destroys
     all other menus
     '''
-    menue_1_button.config(state=NORMAL)
-    menue_2_button.config(state=DISABLED)
-    menue_3_button.config(state=NORMAL)
-    #menue_4_button.config(state=NORMAL)
+    menue_1_button.configure(state=NORMAL)
+    menue_2_button.configure(state=DISABLED)
+    menue_3_button.configure(state=NORMAL)
     expenses_menue.destroy_menue_1()
     debts_menue.draw_menue_2(main_root, app_state)
     settings_menue.destroy_menue_3()
-    help_menue.destroy_menue_4()
 
 
 def show_menue_3(main_root, app_state: AppState) -> None:
     '''Shows menu 3 and destroys
     all other menus
     '''
-    menue_1_button.config(state=NORMAL)
-    menue_2_button.config(state=NORMAL)
-    menue_3_button.config(state=DISABLED)
-    #menue_4_button.config(state=NORMAL)
+    menue_1_button.configure(state=NORMAL)
+    menue_2_button.configure(state=NORMAL)
+    menue_3_button.configure(state=DISABLED)
     expenses_menue.destroy_menue_1()
     debts_menue.destroy_menue_2()
     settings_menue.draw_menue_3(main_root, app_state)
-    help_menue.destroy_menue_4()
-
-
-def show_menue_4(main_root, app_state: AppState) -> None:
-    '''Shows menu 4 and destroys
-    all other menus
-    '''
-    menue_1_button.config(state=NORMAL)
-    menue_2_button.config(state=NORMAL)
-    menue_3_button.config(state=NORMAL)
-    menue_4_button.config(state=DISABLED)
-    expenses_menue.destroy_menue_1()
-    debts_menue.destroy_menue_2()
-    settings_menue.destroy_menue_3()
-    help_menue.draw_menue_4(main_root, app_state)
 
 
 def save(app_state: AppState) -> None:
@@ -85,7 +65,6 @@ def draw_menue(main_root: ctk.CTk, app_state: AppState) -> None:
     # Define some Values
     logo = PhotoImage(file=r"Icons\BondMarket_Icon.png")
     settings = PhotoImage(file=r"Icons\settings.png")
-    help = PhotoImage(file=r"Icons\help.png")
     expenses = PhotoImage(file=r"Icons\finance.png")
     debts = PhotoImage(file=r"Icons\debts.png")
     text_color = ThemeManager.theme['color']['text']
@@ -138,18 +117,6 @@ def draw_menue(main_root: ctk.CTk, app_state: AppState) -> None:
                                    text_font=text_font,
                                    border_width=0
                                    )
-    menue_4_button = ctk.CTkButton(root,
-                                   text='Help',
-                                   image=help,
-                                   width=20,
-                                   command=lambda: show_menue_4(
-                                       main_root, app_state),
-                                   fg_color=None,
-                                   hover_color=None,
-                                   text_font=text_font,
-                                   border_width=0,
-                                   state=tkinter.DISABLED
-                                   )
     save_button = ctk.CTkButton(root,
                                 text='Save',
                                 width=10,
@@ -158,13 +125,13 @@ def draw_menue(main_root: ctk.CTk, app_state: AppState) -> None:
                                text='PDF',
                                width=10,
                                command=lambda: pdf.export(app_state))
-    menue_1_button.pack(side='top', padx=5, pady=40, anchor='w')
-    menue_2_button.pack(side='top', padx=5, pady=40, anchor='w')
-    menue_3_button.pack(side='top', padx=5, pady=40, anchor='w')
-    menue_4_button.pack(side='top', padx=5, pady=40, anchor='w')
+    menue_1_button.pack(side='top', padx=5, pady=50, anchor='w')
+    menue_2_button.pack(side='top', padx=5, pady=50, anchor='w')
+    menue_3_button.pack(side='top', padx=5, pady=50, anchor='w')
     PDF_button.pack(side='bottom', padx=5, pady=10)
     save_button.pack(side='bottom', padx=5, pady=10)
     ctk.CTkLabel(root, text='_____________').pack(
         side='bottom', padx=5, pady=2)
     # Shows menu 1 at startup
+    sleep(1)
     show_menue_1(main_root, app_state)

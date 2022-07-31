@@ -36,7 +36,10 @@ def name_does_not_exist():
 
 def send_mail(adress: str):
     return messagebox.showinfo(TITLE,
-                               f'Mail has been send to {adress}')
+                               f'''Mail has been send to {adress}, 
+You have one minute to confirm the email.
+Please do so now, finally click ok so that
+you can be registered''')
 
 def invalide_mail():
     return messagebox.showinfo(TITLE,
@@ -62,3 +65,10 @@ def pdf_saved(path):
     return messagebox.showinfo(TITLE,
                                f'Pdf has been created in {path}/BondMarket Data.pdf')
 
+def older_version():
+    return messagebox.showinfo(TITLE,
+                               f'You are currently using an outdated version!')
+    
+def newest_version():
+    return messagebox.showinfo(TITLE,
+                               f'Currently you are using the new version!')

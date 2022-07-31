@@ -32,7 +32,7 @@ def debts(main_root: ctk.CTk, app_state: AppState) -> None:
             row_frames[i].pack(side='top', anchor='w', padx=5, pady=20)
             try:
                 debts: DebtsStrukture = app_state.debts_state.debts_array[i]
-                lables[i].config(text=f"{debts.sender} must transfer {debts.amount} {currency} to {debts.receiver}")
+                lables[i].configure(text=f"{debts.sender} must transfer {debts.amount} {currency} to {debts.receiver}")
             except IndexError:
                 pass
             lables[i].pack()
@@ -81,7 +81,7 @@ def personal_expenses(main_root: ctk.CTk, app_state: AppState) -> None:
                      text_font=('San Francisco', 12)
                      ).grid(row=3, column=0, sticky='w', padx=5, pady=5)
     ctk.CTkLabel(root,
-                     text=f'{total} {currency}',
+                     text=f'{round(total, 2)} {currency}',
                      text_font=('San Francisco', 12)
                      ).grid(row=3, column=1, sticky='w', padx=5, pady=5) 
 

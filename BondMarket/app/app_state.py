@@ -1,12 +1,12 @@
 """System module."""
 from dataclasses import dataclass
+from log.log_file import Log_file
 from datetime import date as datetime
 import os
 import json
 import pickle
-import subprocess
 
-APP_VERSION = 'ß.5.0.2'
+APP_VERSION = '5.0-beta.3'
 APP_AUTHOR = 'Thierry Meiers'
 LANGUAGE_VERSION = 3.10
 
@@ -15,13 +15,11 @@ APP_DIR_PATH = f"{DOC_PATH}\\BondMarket {APP_VERSION}"
 DATA_DIR_PATH = f"{APP_DIR_PATH}\\BondMarket Data"
 SETTINGS_DIR_PATH = f"{APP_DIR_PATH}\\Settings"
 APP_LOG_DIR_PATH = f"{APP_DIR_PATH}\\BondMarket Log"
-MS_LOG_DIR_PATH = f"{APP_DIR_PATH}\\Mail Service Log"
 BACKUP_DIR_PATH = f"{APP_DIR_PATH}\\BondMarket Backup"
 DIRECTORIES = [APP_DIR_PATH,
          DATA_DIR_PATH,
          SETTINGS_DIR_PATH,
          APP_LOG_DIR_PATH,
-         MS_LOG_DIR_PATH,
          BACKUP_DIR_PATH]
 
 SETTINGS = {
@@ -30,7 +28,8 @@ SETTINGS = {
         "appearance": "light",
         "file_path": f"{DATA_DIR_PATH}\\data.pkl",
         "currency": "\u20ac",
-        "persons_mames": {}
+        "persons_mames": {},
+        "sort_argument": "Date down",
     },
     "main_service":
     {
@@ -39,24 +38,6 @@ SETTINGS = {
         "psw": ''
     }
 }
-
-
-def process_exists(process_name: str) -> bool:
-    """Ts true if the process exists, if not then false.
-
-    Args:
-        process_name (str): Name of an Prozess
-
-    Returns:
-        bool
-    """
-    call = 'TASKLIST', '/FI', f'imagename eq {process_name}'
-    # use buildin check_output right away
-    output = subprocess.check_output(call).decode()
-    # check in last line for process name
-    last_line = output.strip().rsplit('\r\n', maxsplit=1)[-1]
-    # because Fail message could be translated
-    return last_line.lower().startswith(process_name.lower())
 
 
 def average(dictionarry: dict) -> float:
@@ -95,7 +76,6 @@ class TableState:
     """Structure of the Table State.
     """
     table_array = []
-    sort_argument = "Amount up"
     index = 0
     month_filter = datetime.today().strftime('%m')
     year_filter = datetime.today().strftime('%Y')
@@ -131,11 +111,15 @@ def create_all_dir() -> None:
 class AppState:
     """Structure of the App State.
     """
+    log = Log_file()
+    log.initialize(APP_LOG_DIR_PATH)
+    
     data_array = []
     settings = {}
     table_state = TableState()
     debts_state = DebtsState()
     save_state = True
+    log = log
 
     def load_settings(self) -> None:
         """Loads the data from the file settings.json.
@@ -186,16 +170,16 @@ class AppState:
     def sort_data_array(self) -> None:
         """Sorts the data_array according to the argument.
         """
-        if self.table_state.sort_argument == 'Date up':
+        if self.settings["app_settings"]["sort_argument"] == 'Date up':
             self.data_array.sort(
                 key=lambda expenditure: expenditure.date)
-        elif self.table_state.sort_argument == 'Date down':
+        elif self.settings["app_settings"]["sort_argument"] == 'Date down':
             self.data_array.sort(
                 key=lambda expenditure: expenditure.date, reverse=True)
-        elif self.table_state.sort_argument == 'Amount up':
+        elif self.settings["app_settings"]["sort_argument"] == 'Amount up':
             self.data_array.sort(
                 key=lambda expenditure: expenditure.amount)
-        elif self.table_state.sort_argument == 'Amount down':
+        elif self.settings["app_settings"]["sort_argument"] == 'Amount down':
             self.data_array.sort(
                 key=lambda expenditure: expenditure.amount, reverse=True)
 

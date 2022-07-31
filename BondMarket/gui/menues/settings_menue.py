@@ -1,12 +1,17 @@
+from json import load
+from time import sleep
 from tkinter import filedialog
 import messagebox.messagebox as msg
 import tkinter
 import customtkinter as ctk
 from customtkinter.theme_manager import ThemeManager
 from customtkinter import appearance_mode_tracker
-from app.app_state import AppState
+from app.app_state import AppState, APP_VERSION
 from webbrowser import open
 import mail.get_mail as get_mail
+import requests
+import threading
+from mail.get_mail import connect
 import mail.send_mail as send_mail
 
 #### Main Settings ####
@@ -62,7 +67,7 @@ def file_settings(main_root: ctk.CTk, app_state: AppState) -> None:
         row=2, column=1, pady=10, padx=10, sticky='w')
 
 
-def appearance_settings(main_root: ctk.CTk, app_state: AppState) -> None:
+def appearance_settings(app_root: ctk.CTk, main_root: ctk.CTk, app_state: AppState) -> None:
 
     def change_dark_mode_switch(app_state: AppState):
         if dark_mode_switch.get() == 1:
@@ -71,6 +76,7 @@ def appearance_settings(main_root: ctk.CTk, app_state: AppState) -> None:
         else:
             ctk.set_appearance_mode("light")
             app_state.settings["app_settings"]["appearance"] = "light"
+        app_root.state('zoomed')
 
     root = ctk.CTkFrame(main_root)
     root.pack(side='top', fill='x', anchor='w',
@@ -120,13 +126,13 @@ def user_settings(main_root: ctk.CTk, app_state: AppState) -> None:
 
     def show_mail(app_state: AppState, name: str) -> None:
         if name == '':
-            linked_mail.config(text='Select Person')
+            linked_mail.configure(text='Select Person')
         else:
             mail = app_state.settings['app_settings']['persons_mames'][name]
             if mail == '':
-                linked_mail.config(text='No mail found!')
+                linked_mail.configure(text='No mail found!')
             else:
-                linked_mail.config(text=app_state.settings['app_settings']['persons_mames'][name])
+                linked_mail.configure(text=app_state.settings['app_settings']['persons_mames'][name])
             
     def add_user(app_state: AppState):
         name = e1.get()
@@ -136,7 +142,7 @@ def user_settings(main_root: ctk.CTk, app_state: AppState) -> None:
         if name not in app_state.settings['app_settings']['persons_mames'].keys():
             app_state.settings['app_settings']['persons_mames'][name] = ''
             msg.was_added(name)
-            e1.config(values=list(app_state.settings['app_settings']['persons_mames'].keys()))
+            e1.configure(values=list(app_state.settings['app_settings']['persons_mames'].keys()))
             e1.set('')
         elif name in app_state.settings['app_settings']['persons_mames'].keys():
             msg.name_exist()
@@ -148,7 +154,7 @@ def user_settings(main_root: ctk.CTk, app_state: AppState) -> None:
         if name in app_state.settings['app_settings']['persons_mames']:
             del app_state.settings['app_settings']['persons_mames'][name]
             msg.was_removed(name)
-            e1.config(values=list(app_state.settings['app_settings']['persons_mames'].keys()))
+            e1.configure(values=list(app_state.settings['app_settings']['persons_mames'].keys()))
             e1.set('')
         else:
             msg.name_does_not_exist()
@@ -183,14 +189,45 @@ def user_settings(main_root: ctk.CTk, app_state: AppState) -> None:
 
 def mail_user_settings(main_root: ctk.CTk, app_state: AppState) -> None:
     
+    def loading_animation():
+        stage: int = 0
+        while t1.is_alive():
+            if stage == 0:
+                add_user_.configure(text='Loading.      ')
+                stage += 1
+            elif stage == 1:
+                add_user_.configure(text='Loading..     ')
+                stage += 1
+            elif stage == 2:
+                add_user_.configure(text='Loading...    ')
+                stage += 1
+            elif stage == 3:
+                add_user_.configure(text='Loading....   ')
+                stage = 0
+            sleep(0.4)
+        add_user_.configure(text='Add')
+
+    def wait_for_answer() -> None:
+        counter: int = 0
+        while connect(app_state, "login_command") is False:
+            sleep(10)
+            counter += 1
+            if counter == 6:
+                break
+    
     def add_user(app_state: AppState):
-        mail = e1.get()
+        name = e1.get()
+        mail = e2.get()
         if mail == '':
+            t1.start()
+            t2.start()
             return
         if mail not in app_state.settings['app_settings']['persons_mames'].values():
-            if send_mail.login_mail(mail, 'User', app_state):
+            if send_mail.login_mail(mail, name, app_state):
                 msg.send_mail(mail)
-                e1.delete(0, 'end')
+                t1.start()
+                t2.start()
+                e2.delete(0, 'end')
             else:
                 msg.invalide_mail()
         elif mail in app_state.settings['app_settings']['persons_mames'].values():
@@ -200,18 +237,26 @@ def mail_user_settings(main_root: ctk.CTk, app_state: AppState) -> None:
             
     root = ctk.CTkFrame(main_root)
     root.pack(side='top', padx=10, pady=10, fill='x')
-    
+    t1 = threading.Thread(target=(lambda: wait_for_answer()))
+    t2 = threading.Thread(target=(lambda: loading_animation()))
+
     ctk.CTkLabel(root, text='User Settings',
                  text_font=('Segoe UI', 15)
                  ).grid(row=0, column=0, columns=1, padx=5, pady=5)
     
-    ctk.CTkLabel(root, text='E-Mail:').grid(row=1, column=0, padx=10, pady=10)
-    e1 = ctk.CTkEntry(root, width=200)
+    ctk.CTkLabel(root, text='E-Mail:').grid(row=2, column=0, padx=10, pady=10)
+    ctk.CTkLabel(root, text='Name:').grid(row=1, column=0, padx=10, pady=10)
+
+    e1 = ctk.CTkComboBox(root, width=200, values=list(list(app_state.settings['app_settings']['persons_mames'].keys())))
     e1.grid(row=1, column=1, padx=10, pady=10)
-    ctk.CTkButton(root, text='Add', command=lambda: add_user(app_state)).grid(row=2, column=0, padx=10, pady=10)
+    e1.set("")
+    e2 = ctk.CTkEntry(root, width=200)
+    e2.grid(row=2, column=1, padx=10, pady=10)
+    add_user_ = ctk.CTkButton(root, text='Add/Check for login', command=lambda: add_user(app_state))
+    add_user_.grid(row=3, column=0, padx=10, pady=10)
     
     ctk.CTkLabel(root, text='Send a confirmation mail to a user or not user.\nFor this an email account must be given below.'
-                 ).grid(row=3, column=0, columns=2, padx=5, pady=5)
+                 ).grid(row=4, column=0, columns=2, padx=5, pady=5)
     
 
 def mail_service_settings(main_root: ctk.CTk, app_state: AppState) -> None:
@@ -225,9 +270,9 @@ def mail_service_settings(main_root: ctk.CTk, app_state: AppState) -> None:
             app_state.settings["main_service"]["server"] = e1.get()
             app_state.settings["main_service"]["user"] = e2.get()
             app_state.settings["main_service"]["psw"] = e3.get()
-            b1.config(text='Conneced!', text_color="#2ECC71")
+            b1.configure(text='Conneced!', text_color="#2ECC71")
         else:
-            b1.config(text='Error!', text_color="#C0392B")
+            b1.configure(text='Error!', text_color="#C0392B")
 
     root = ctk.CTkFrame(main_root)
     root.pack(side='top', padx=10, pady=10, fill='x')
@@ -274,6 +319,16 @@ def main_service_notes(main_root: ctk.CTk) -> None:
     ctk.CTkLabel(main_root, text=s1).pack(side='top', padx=10, pady=10, fill='x')
 
 
+def check_for_update() -> None:
+    request: str = requests.get("https://api.github.com/repos/MeiTh0717/BondMarket/releases/latest").json()['tag_name']
+    request = request.removeprefix('v')
+    print(APP_VERSION, request)
+    if APP_VERSION < request:
+        msg.older_version()
+    else:
+        msg.newest_version()
+
+
 def draw_menue_3(main_root, app_state: AppState):
 
     global root
@@ -311,10 +366,12 @@ def draw_menue_3(main_root, app_state: AppState):
     column3.pack(side='left', anchor='w', fill='both', padx=5, pady=5)
     column4.pack(side='left', anchor='w', fill='both', padx=5, pady=5)
     
+    ctk.CTkButton(root, text="Check for Update", command=check_for_update).pack(side='bottom', anchor='e', padx=10, pady=10)
+    
     user_settings(column1, app_state)
     file_settings(column1, app_state)
     currency_settings(column1, app_state)
-    appearance_settings(column1, app_state)
+    appearance_settings(main_root, column1, app_state)
     appearance_notes(column1)
     
     mail_user_settings(column2, app_state)

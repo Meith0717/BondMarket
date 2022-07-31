@@ -50,7 +50,7 @@ def table_filter(main_root: ctk.CTk, app_state: AppState) -> None:
             argument (str)
             app_state (AppState)
         """
-        app_state.table_state.sort_argument = argument
+        app_state.settings["app_settings"]["sort_argument"] = argument
         update_table(app_state)
 
     root = ctk.CTkFrame(main_root)
@@ -97,7 +97,7 @@ def update_entrys_combox(app_state: AppState) -> None:
     Args:
         app_state (AppState)
     """
-    e1.config(values=list(
+    e1.configure(values=list(
         app_state.settings["app_settings"]["persons_mames"].keys()))
     e1.set('')
 
@@ -228,12 +228,12 @@ def update_table(app_state: AppState) -> None:
         try:
             expenditure: ExpenditureStrukture = app_state.table_state.table_array[
                 i+app_state.table_state.index]
-            text_lables[i].config(text=f"{expenditure.person_name} {expenditure.comment}")
-            date_lables[i].config(text=f"{expenditure.date}")
+            text_lables[i].configure(text=f"{expenditure.person_name} {expenditure.comment}")
+            date_lables[i].configure(text=f"{expenditure.date}")
             if expenditure.amount == 0:
-                amount_lables[i].config(text="")
+                amount_lables[i].configure(text="")
             else:
-                amount_lables[i].config(
+                amount_lables[i].configure(
                     text=f"{-expenditure.amount} {app_state.settings['app_settings']['currency']}")
         except IndexError:
             app_state.table_state.index -= 10
@@ -297,13 +297,13 @@ def table(main_root, app_state: AppState) -> None:
         expenditure: ExpenditureStrukture = app_state.table_state.table_array[i]
         
         amount_lables[i].pack(side='top', anchor='nw', padx=12, pady=5)
-        amount_lables[i].config(text=f"{-expenditure.amount} {app_state.settings['app_settings']['currency']}")
+        amount_lables[i].configure(text=f"{-expenditure.amount} {app_state.settings['app_settings']['currency']}")
         
         date_lables[i].pack(side='right', anchor='ne', padx=12, pady=5)
-        date_lables[i].config(text=f"{expenditure.date}")
+        date_lables[i].configure(text=f"{expenditure.date}")
         
         text_lables[i].pack(side='left', anchor='sw', padx=12, pady=5)
-        text_lables[i].config(text=f"{expenditure.person_name} {expenditure.comment}")
+        text_lables[i].configure(text=f"{expenditure.person_name} {expenditure.comment}")
 
 
     row_frames[0].canvas.bind('<Button-1>', lambda e: get_row(0, app_state))
