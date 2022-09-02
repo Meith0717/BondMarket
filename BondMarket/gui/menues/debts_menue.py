@@ -61,7 +61,7 @@ def personal_expenses(main_root: ctk.CTk, app_state: AppState) -> None:
     fg = ThemeManager.theme['color']['text'][appearance_mode_tracker.AppearanceModeTracker.appearance_mode]
 
     plt.rcParams.update({'axes.facecolor':'black'})
-    figure1 = plt.Figure(figsize=(9,6))
+    figure1 = plt.Figure(figsize=(9,6)) 
     figure1.set_facecolor(bg)
     ax = figure1.add_subplot(111)
     ax.pie(personal_expenses, labels = user_names, autopct= func, textprops={'color':fg})

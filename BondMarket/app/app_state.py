@@ -112,6 +112,7 @@ class AppState:
     """Structure of the App State.
     """
     log = Log_file()
+    create_all_dir()
     log.initialize(APP_LOG_DIR_PATH)
     
     data_array = []
